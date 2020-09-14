@@ -10,7 +10,8 @@
     "Product Brand": "string",
     "Product Availability": "string",
     "Product Id": "string",
-    "Product Release Year": "integer"
+    "Product Release Year": "integer",
+    "Product Vendor": "string"
 }
 ```
 
