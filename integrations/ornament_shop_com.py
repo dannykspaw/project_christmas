@@ -109,7 +109,9 @@ if __name__ == "__main__":
     url = 'https://www.ornament-shop.com/'
 
     years = get_year_links(driver)
-    years = { '1986': years['1986'] }
+    filtered_year = getenv('YEAR')
+    if filtered_year:
+        years = { filtered_year: years[filtered_year] }
 
     completed_products = []
     cache = getenv('CACHE')
