@@ -77,8 +77,10 @@ def get_ornaments(driver, url, links={}):
 
 
 def get_ornament_details(driver, link, year):
+    # navigate to the ornament details page
     driver.get(link)
 
+    # define and grab all elements from the ornament details page
     brand_element = driver.find_element_by_xpath('/html/body/div[3]/div[1]/div[2]/div/div[1]/section[2]/div/dl/dd[4]/a/span')
     sku_element = driver.find_element_by_xpath('/html/body/div[3]/div[1]/div[2]/div/div[1]/section[2]/div/dl/dd[5]')
     name_element = driver.find_element_by_xpath('/html/body/div[3]/div[1]/div[2]/div/div[1]/section[2]/div/h1')
@@ -86,21 +88,22 @@ def get_ornament_details(driver, link, year):
     availability_element = driver.find_element_by_xpath('/html/body/div[3]/div[1]/div[2]/div/div[1]/section[2]/div/dl/dd[6]')
     id_element = driver.find_element_by_xpath('/html/body/div[3]/div[1]/div[2]/div/div[1]/section[3]/div[1]/form[1]/input[2]')
 
-    ornament_details = {
-        "Product Code": sku_element.text,
-        "Product Name": name_element.text,
-        "Product Price": price_element.text,
-        "Product Brand": brand_element.text,
-        "Product Availability": availability_element.text,
-        "Product Id": id_element.get_attribute('value'),
-        "Product Release Year": year,
-        "Product Vendor": "ornament-shop.com"
-    } 
+    # make sure that there is a column for everything in the schema
+    ornament_details = dict.fromkeys(COLUMNS, None)
+    ornament_details["Product Code"] = sku_element.text
+    ornament_details["Product Name"]: name_element.text
+    ornament_details["Product Price"]: price_element.text
+    ornament_details["Product Brand"]: brand_element.text
+    ornament_details["Product Availability"]: availability_element.text
+    ornament_details["Product Id"]: id_element.get_attribute('value')
+    ornament_details["Product Release Year"]: year
+    ornament_details["Product Vendor"]: "ornament-shop.com"
 
     return ornament_details
     
 
 if __name__ == "__main__":
+    # setup driver for chrome instance
     chrome_options = Options()	
     chrome_options.add_argument('--no-sandbox')	
     chrome_options.add_argument('--window-size=100,100')	
@@ -110,14 +113,20 @@ if __name__ == "__main__":
 
     url = 'https://www.ornament-shop.com/'
 
+    # get all links for each year
+    # todo: cache the year links between starts
     years = get_year_links(driver)
+
+    # check if the year is being filtered
     filtered_year = getenv('YEAR')
     if filtered_year:
         years = { filtered_year: years[filtered_year] }
 
+    # get the cache file path
     completed_products = []
     cache = getenv('CACHE')
     if path.exists(cache):
+        # if it exists, get all product names
         cached_products = pd.read_csv(cache)
         completed_products = cached_products['Product Name'].tolist()
         print('loaded {} cached products'.format(len(completed_products)))
@@ -129,21 +138,21 @@ if __name__ == "__main__":
         product_links = {}
         get_ornaments(driver, url, product_links)
 
-        product_details_df = pd.DataFrame(columns=COLUMNS)
-
         i = 0
         count = len(product_links)
         for product, link in product_links.items():
             i += 1
+
+            # skip if this product has already been cached
             if product in completed_products:
                 print('{}/{} {} - skipping duplicate for {} at link {}'.format(i, count, year, product, link))
                 continue
 
             print('{}/{} {} - getting details for {} at link {}'.format(i, count, year, product, link))
 
+            # get the ornament details for this link
             product_details = get_ornament_details(driver, link, year)
-            product_details_df = product_details_df.append(product_details, ignore_index=True)
 
-            
+            # if the cache directory was provided, cache it
             if cache:
                 cache_product_details(year, pd.DataFrame(product_details, index=[0]), cache)
