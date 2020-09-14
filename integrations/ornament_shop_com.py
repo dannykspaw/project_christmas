@@ -16,16 +16,16 @@ COLUMNS=[
 ]
 
 
-def cache_product_details(year, links, cache):
-    # cache the product links in csv/pickle format
-    print('caching count {} product links from year {}'.format(len(links), year))
+def cache_product_details(year, details, cache):
+    # cache the product details in csv/pickle format
+    # print('caching count {} product details from year {}'.format(len(details), year))
 
     # create seed file if it doesn't already exist
-    if not path.exists(cache):
-        open(cache, "x")
-
+    file_mode = 'a' if path.exists(cache) else 'x'
+    insert_header = False if file_mode == 'a' else True
+        
     # append the current year to an already existing csv
-    links.to_csv(cache, mode='a', header=False)
+    details.to_csv(cache, mode=file_mode, header=insert_header)
 
 
 def get_year_links(driver):
@@ -98,36 +98,48 @@ def get_ornament_details(driver, link, year):
     return ornament_details
     
 
-chrome_options = Options()	
-chrome_options.add_argument('--no-sandbox')	
-chrome_options.add_argument('--window-size=100,100')	
-chrome_options.add_argument('--headless')	
-# chrome_options.add_argument('--disable-gpu')	
-driver = webdriver.Chrome(options=chrome_options)
+if __name__ == "__main__":
+    chrome_options = Options()	
+    chrome_options.add_argument('--no-sandbox')	
+    chrome_options.add_argument('--window-size=100,100')	
+    chrome_options.add_argument('--headless')	
+    # chrome_options.add_argument('--disable-gpu')	
+    driver = webdriver.Chrome(options=chrome_options)
 
-url = 'https://www.ornament-shop.com/'
+    url = 'https://www.ornament-shop.com/'
 
-years = get_year_links(driver)
+    years = get_year_links(driver)
+    years = { '1986': years['1986'] }
 
-for year, url in years.items():
-    print('getting product links for year {} link {}'.format(year, url))
-
-    # get all the product links for this year
-    product_links = {}
-    get_ornaments(driver, url, product_links)
-
-    product_details_df = pd.DataFrame(columns=COLUMNS)
-
-    i = 0
-    count = len(product_links)
-    for product, link in product_links.items():
-        print('{}/{} {} - getting details for {} at link {}'.format(i, count, year, product, link))
-
-        product_details = get_ornament_details(driver, link, year)
-        product_details_df = product_details_df.append(product_details, ignore_index=True)
-
-        i += 1
-
+    completed_products = []
     cache = getenv('CACHE')
-    if cache:
-        cache_product_details(year, product_details_df, cache)
+    if path.exists(cache):
+        cached_products = pd.read_csv(cache)
+        completed_products = cached_products['Product Name'].tolist()
+        print('loaded {} cached products'.format(len(completed_products)))
+
+    for year, url in years.items():
+        print('getting product links for year {} link {}'.format(year, url))
+
+        # get all the product links for this year
+        product_links = {}
+        get_ornaments(driver, url, product_links)
+
+        product_details_df = pd.DataFrame(columns=COLUMNS)
+
+        i = 0
+        count = len(product_links)
+        for product, link in product_links.items():
+            i += 1
+            if product in completed_products:
+                print('{}/{} {} - skipping duplicate for {} at link {}'.format(i, count, year, product, link))
+                continue
+
+            print('{}/{} {} - getting details for {} at link {}'.format(i, count, year, product, link))
+
+            product_details = get_ornament_details(driver, link, year)
+            product_details_df = product_details_df.append(product_details, ignore_index=True)
+
+            
+            if cache:
+                cache_product_details(year, pd.DataFrame(product_details, index=[0]), cache)
