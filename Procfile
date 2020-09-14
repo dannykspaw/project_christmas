@@ -1,1 +1,1 @@
-web: python ./integrations/ornament_shop_com.py
+worker: python ./integrations/ornament_shop_com.py
