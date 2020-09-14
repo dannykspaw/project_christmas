@@ -12,7 +12,8 @@ COLUMNS=[
     "Product Brand",
     "Product Availability",
     "Product Id",
-    "Product Release Year"
+    "Product Release Year",
+    "Product Vendor"
 ]
 
 
@@ -92,7 +93,8 @@ def get_ornament_details(driver, link, year):
         "Product Brand": brand_element.text,
         "Product Availability": availability_element.text,
         "Product Id": id_element.get_attribute('value'),
-        "Product Release Year": year
+        "Product Release Year": year,
+        "Product Vendor": "ornament-shop.com"
     } 
 
     return ornament_details
