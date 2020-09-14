@@ -91,13 +91,13 @@ def get_ornament_details(driver, link, year):
     # make sure that there is a column for everything in the schema
     ornament_details = dict.fromkeys(COLUMNS, None)
     ornament_details["Product Code"] = sku_element.text
-    ornament_details["Product Name"]: name_element.text
-    ornament_details["Product Price"]: price_element.text
-    ornament_details["Product Brand"]: brand_element.text
-    ornament_details["Product Availability"]: availability_element.text
-    ornament_details["Product Id"]: id_element.get_attribute('value')
-    ornament_details["Product Release Year"]: year
-    ornament_details["Product Vendor"]: "ornament-shop.com"
+    ornament_details["Product Name"] = name_element.text
+    ornament_details["Product Price"] = price_element.text
+    ornament_details["Product Brand"] = brand_element.text
+    ornament_details["Product Availability"] = availability_element.text
+    ornament_details["Product Id"] = id_element.get_attribute('value')
+    ornament_details["Product Release Year"] = year
+    ornament_details["Product Vendor"] = "ornament-shop.com"
 
     return ornament_details
     
