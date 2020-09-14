@@ -1,0 +1,7 @@
+build:
+    docker:
+      worker: Dockerfile
+release:
+    image: worker
+run:
+    worker: python ./integrations/ornament_shop_com.py
