@@ -27,3 +27,17 @@ seed/                   - contains a dataset from each data source to seed the d
     data-source-1.csv
     
 ```
+
+### integrations
+ornament-shop.com
+- [x] - get links for every year
+- [x] - get products by year
+- [x] - get product details using product link
+- [x] - cache product details in csv
+
+hookedonhallmark.com
+- [ ] - get links for every year
+- [ ] - get products by year
+    - The by-year links shown on the yearly page don't account for segmented ornaments, breaking product acquisition, returning a very low number or no products at all to scrape
+- [x] - get product details using product link
+- [x] - cache product details in csv

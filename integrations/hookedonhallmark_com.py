@@ -31,26 +31,27 @@ def cache_product_details(year, details, cache):
 
 
 def get_year_links(driver):
-    url = 'https://www.ornament-shop.com/hallmark-ornaments-by-year.html'
+    url = 'https://www.hookedonhallmark.com/keepsake-hallmark-ornaments-by-year.html'
     driver.get(url)
 
-    content_blocks = driver.find_elements_by_class_name("navList-item")
+    content_blocks = driver.find_elements_by_class_name("sub-categories")
     year_links = {}
 
     for block in content_blocks:
         element = block.find_element_by_tag_name("a")
         year_link = element.get_attribute("href")
+        print(year_link)
 
-        segments = year_link.split('/')
-        year = segments[3].split('-')[0]
+        name_span = block.find_element_by_tag_name("span")
 
-        '''
-        {
-            2020: 'https://example.com/',
-            2019: 'https://example.com/'
-        }
-        '''
+        try:
+            year_img = name_span.find_element_by_tag_name("img")
+            img_alt = year_img.get_attribute("alt")
+            segments = img_alt.split(' ')
+        except:
+            segments = name_span.text.split(' ')
 
+        year = segments[0]
         year_links[year] = year_link
 
     return year_links
@@ -59,16 +60,14 @@ def get_year_links(driver):
 def get_ornaments(driver, url, links={}):
     driver.get(url)
 
-    ornament_blocks = driver.find_elements_by_class_name("card")
+    ornament_blocks = driver.find_elements_by_class_name("product-item")
 
     for block in ornament_blocks:
-        link_block = block.find_element_by_class_name("card-figure")
-        element = link_block.find_element_by_tag_name("a")
-        ornament_link = element.get_attribute("href")
+        name_block = block.find_element_by_class_name("name")
+        ornament_name = name_block.text
 
-        name_block = block.find_element_by_class_name("card-title")
-        element = name_block.find_element_by_tag_name("a")
-        ornament_name = element.get_attribute("text")
+        a = name_block.find_element_by_tag_name('a')
+        ornament_link = a.get_attribute("href")
 
         if ornament_name in links.keys():
             print('duplicate ornament name found: {}'.format(ornament_name))
@@ -76,8 +75,18 @@ def get_ornaments(driver, url, links={}):
         links[ornament_name] = ornament_link
 
     try:
-        next_page_block = driver.find_element_by_class_name('pagination-item--next')
-        next_page_link = next_page_block.find_element_by_tag_name('a').get_attribute('href')
+        pagination_block = driver.find_elements_by_class_name('paging')
+        paging_elements = pagination_block.find_elements_by_tag_name('a')
+
+        next_page_link = None
+        for a in paging_elements:
+            if 'next' in a.text.lower():
+                next_page_link = a.get_attribute('href')
+                break
+
+        if next_page_link is None:
+            raise Exception('no new page link found')
+
         print('next page link found: {}'.format(next_page_link))
         get_ornaments(driver, next_page_link, links)
     except:
@@ -89,23 +98,26 @@ def get_ornament_details(driver, link, year):
     driver.get(link)
 
     # define and grab all elements from the ornament details page
-    brand_element = driver.find_element_by_xpath('/html/body/div[3]/div[1]/div[2]/div/div[1]/section[2]/div/dl/dd[4]/a/span')
-    sku_element = driver.find_element_by_xpath('/html/body/div[3]/div[1]/div[2]/div/div[1]/section[2]/div/dl/dd[5]')
-    name_element = driver.find_element_by_xpath('/html/body/div[3]/div[1]/div[2]/div/div[1]/section[2]/div/h1')
-    price_element = driver.find_element_by_xpath('/html/body/div[3]/div[1]/div[2]/div/div[1]/section[2]/div/dl/dd[3]/div/span')
-    availability_element = driver.find_element_by_xpath('/html/body/div[3]/div[1]/div[2]/div/div[1]/section[2]/div/dl/dd[6]')
-    id_element = driver.find_element_by_xpath('/html/body/div[3]/div[1]/div[2]/div/div[1]/section[3]/div[1]/form[1]/input[2]')
+    brand_element = 'hallmark'
+    sku_element = driver.find_element_by_xpath('//*[@id="product_id"]')
+    price_element = driver.find_element_by_xpath('//*[@id="price"]')
+    availability_element = driver.find_element_by_xpath('//*[@id="availability"]')
+    id_element = driver.find_element_by_xpath('//*[@id="add"]/input[1]')
 
     # make sure that there is a column for everything in the schema
     ornament_details = dict.fromkeys(COLUMNS, None)
     ornament_details["Product Code"] = sku_element.text
-    ornament_details["Product Name"] = name_element.text
+
+    # todo: this wasn't working consistently, so i am using the name found on
+    # the yearly page to populate the database
+    # ornament_details["Product Name"] = name_element.text
+
     ornament_details["Product Price"] = price_element.text
-    ornament_details["Product Brand"] = brand_element.text
+    ornament_details["Product Brand"] = brand_element
     ornament_details["Product Availability"] = availability_element.text
     ornament_details["Product Id"] = id_element.get_attribute('value')
     ornament_details["Product Release Year"] = year
-    ornament_details["Product Vendor"] = "ornament-shop.com"
+    ornament_details["Product Vendor"] = "hookedonhallmark.com"
 
     return ornament_details
     
@@ -119,7 +131,7 @@ if __name__ == "__main__":
     # chrome_options.add_argument('--disable-gpu')	
     driver = webdriver.Chrome(options=chrome_options)
 
-    url = 'https://www.ornament-shop.com/'
+    # url = 'https://www.hookedonhallmark.com/'
 
     # get all links for each year
     # todo: cache the year links between starts
@@ -139,7 +151,7 @@ if __name__ == "__main__":
 
     # get the cache file path
     completed_products = []
-    cache = './seed/ornament_shop_com.csv'
+    cache = getenv('CACHE')
     if path.exists(cache):
         # if it exists, get all product names
         cached_products = pd.read_csv(cache)
@@ -167,6 +179,9 @@ if __name__ == "__main__":
 
             # get the ornament details for this link
             product_details = get_ornament_details(driver, link, year)
+
+            # todo: use the get_ornament_details naming for consistency
+            product_details["Product Name"] = product
 
             # if the cache directory was provided, cache it
             if cache:
