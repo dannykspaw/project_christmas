@@ -129,7 +129,10 @@ if __name__ == "__main__":
     if year:
         years = { year: years[year] }
 
-    # check if the year is being filtered
+    # we are using a separate service to assign the year
+    # so we can create multiple processes that each handle
+    # a subset of the total number of products. this makes
+    # for more efficient cpu usage
     config_service_port = getenv('CONFIG_SERVICE_PORT', None)
     if config_service_port:
         # request a year from the config service
@@ -172,4 +175,7 @@ if __name__ == "__main__":
             if cache:
                 cache_product_details(year, pd.DataFrame(product_details, index=[0]), cache)
 
+    # release this year from the config service
+    # in order to allow another process to sync
+    # updates later on
     requests.post('http://localhost:3000/{}'.format(getpid()))
