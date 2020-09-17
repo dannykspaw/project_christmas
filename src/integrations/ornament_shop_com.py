@@ -108,8 +108,8 @@ def get_ornament_details(driver, link, year):
     ornament_details["Product Vendor"] = "ornament-shop.com"
 
     return ornament_details
-    
 
+    
 if __name__ == "__main__":
     # setup driver for chrome instance
     chrome_options = Options()	

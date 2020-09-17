@@ -14,8 +14,8 @@ RUN unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
 # set display port to avoid crash
 ENV DISPLAY=:99
 
-RUN mkdir ./seed
-ENV CACHE=./seed/ornament_shop_com.csv
+RUN mkdir ./src/seed
+ENV CACHE=./src/seed/ornament_shop_com.csv
 
 COPY requirements.txt /requirements.txt
 RUN pip install --upgrade setuptools
@@ -23,4 +23,4 @@ RUN pip install -r /requirements.txt
 
 COPY ./integrations ./integrations
 
-CMD ["python", "./integrations/ornament_shop_com.py"]
+CMD ["python", "./src/integrations/ornament_shop_com.py"]

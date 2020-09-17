@@ -1,6 +1,6 @@
 from os import getenv, path, getpid
+import re
 import requests
-
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import pandas as pd
@@ -62,6 +62,21 @@ def get_ornaments(driver, url, links={}):
 
     ornament_blocks = driver.find_elements_by_class_name("product-item")
 
+    # try to find the category button that links to the "view all" page
+    if len(ornament_blocks) == 0:
+        category_blocks = driver.find_elements_by_class_name('sub-categories')
+        reg = re.compile(r'view-all', re.IGNORECASE)
+
+        for block in category_blocks:
+            view_all_a = block.find_element_by_tag_name('a')
+            view_all_link = view_all_a.get_attribute('href')
+            is_valid_link = len(reg.findall(view_all_link)) > 0
+            if is_valid_link:
+                print('using view all page to get products {}'.format(view_all_link))
+                driver.get(view_all_link)
+                ornament_blocks = driver.find_elements_by_class_name("product-item")
+                break
+
     for block in ornament_blocks:
         name_block = block.find_element_by_class_name("name")
         ornament_name = name_block.text
@@ -75,7 +90,7 @@ def get_ornaments(driver, url, links={}):
         links[ornament_name] = ornament_link
 
     try:
-        pagination_block = driver.find_elements_by_class_name('paging')
+        pagination_block = driver.find_element_by_class_name('paging')
         paging_elements = pagination_block.find_elements_by_tag_name('a')
 
         next_page_link = None
@@ -89,8 +104,8 @@ def get_ornaments(driver, url, links={}):
 
         print('next page link found: {}'.format(next_page_link))
         get_ornaments(driver, next_page_link, links)
-    except:
-        print('no next page found from url: {}'.format(url))
+    except Exception as err:
+        print('no next page found from url: {} err {}'.format(url, err))
 
 
 def get_ornament_details(driver, link, year):
@@ -107,11 +122,6 @@ def get_ornament_details(driver, link, year):
     # make sure that there is a column for everything in the schema
     ornament_details = dict.fromkeys(COLUMNS, None)
     ornament_details["Product Code"] = sku_element.text
-
-    # todo: this wasn't working consistently, so i am using the name found on
-    # the yearly page to populate the database
-    # ornament_details["Product Name"] = name_element.text
-
     ornament_details["Product Price"] = price_element.text
     ornament_details["Product Brand"] = brand_element
     ornament_details["Product Availability"] = availability_element.text
@@ -193,4 +203,7 @@ if __name__ == "__main__":
     # release this year from the config service
     # in order to allow another process to sync
     # updates later on
-    requests.post('http://localhost:3000/{}'.format(getpid()))
+    try:
+        requests.post('http://localhost:3000/{}'.format(getpid()))
+    except:
+        print('config service returned an error')
