@@ -18,5 +18,6 @@ def connect():
     print('password', getenv('DB_PASSWORD'))
     # create tables if they don't
     # return the database cursor
-    print(connect.cursor)
+    print(str(cursor.closed).replace("0","Connected to {}...".format(getenv('DB_NAME'))))
+    return connect.cursor()
 connect()
