@@ -11,7 +11,8 @@ POSTGRES_PASSWORD - (required)
 #### data schemas
 ```sql
 CREATE TABLE products (
-    sku VARCHAR(20) PRIMARY KEY,           
+    id VARCHAR(24) PRIMARY KEY,
+    sku VARCHAR(20) NOT NULL,
     name VARCHAR(40) NOT NULL,
     price FLOAT NOT NULL,
     brand VARCHAR(40) NOT NULL,
@@ -19,6 +20,7 @@ CREATE TABLE products (
     release_year VARCHAR(20) NOT NULL,
     vendor_id VARCHAR(20) NOT NULL,
     vendor_name VARCHAR(20) NOT NULL,
+    link VARCHAR(100) NOT NULL,
     synced_at DATE NOT NULL,
     created_at DATE NOT NULL,
 )
