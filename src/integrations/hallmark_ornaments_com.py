@@ -15,7 +15,8 @@ COLUMNS=[
     "Product Availability",
     "Product Id",
     "Product Release Year",
-    "Product Vendor"
+    "Product Vendor",
+    "Product Link"
 ]
 
 ornament_df = pd.DataFrame(columns=COLUMNS)
@@ -43,7 +44,7 @@ for year in year_content_block[0:48]:
     year_links[year_num] = year_link+'?viewall=1'
 
 #get number of products
-for year in range(1973,2020):
+for year in range(1973,1975):
     try:
         driver.get(year_links[str(year)])
         quantity = driver.find_element_by_class_name('product-count')
@@ -91,9 +92,12 @@ for year in range(1973,2020):
         product_id = sku_name_code_split.split("catalogid:")[1].split(",id")[0]
         product_release_year = year
         product_vendor = "hallmarkornaments.com"
+        product_link = driver.current_url
 
-        product_info={"Product Code":product_code,"Product Name":product_name,"Product Price":product_price,"Product Availability":product_availability,"Product Brand":product_brand,"Product Id":product_id,"Product Release Year":product_release_year,"Product Vendor":product_vendor}
+        product_info={"Product Code":product_code,"Product Name":product_name,"Product Price":product_price,"Product Availability":product_availability,"Product Brand":product_brand,"Product Id":product_id,"Product Release Year":product_release_year,"Product Vendor":product_vendor,"Product Link":product_link}
         ornament_df = ornament_df.append(product_info,ignore_index=True)
         print(ornament_df.shape)
+        print(ornament_df.columns)
+        print(ornament_df.head(5))
 
 driver.quit()
