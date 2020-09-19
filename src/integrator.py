@@ -1,8 +1,8 @@
-# gets the data
+# gets the data from the rich
 
 # talk with each integration
 # connect to the db to write new rows
 
-from db import connect
+from utils.postgres import connect
 
 conn = connect()

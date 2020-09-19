@@ -1,29 +1,28 @@
 # project_christmas
 
-#### data schema
-```json
-// product
-{
-    "Product Code": "string",
-    "Product Name": "string",
-    "Product Price": "float",
-    "Product Brand": "string",
-    "Product Availability": "string",
-    "Product Id": "string",
-    "Product Release Year": "integer",
-    "Product Vendor": "string"
-}
+#### environment variables
+```bash
+POSTGRES_HOST - (required)
+POSTGRES_NAME - (required)
+POSTGRES_USER - (required)
+POSTGRES_PASSWORD - (required)
 ```
 
-#### folder structure
-```bash
-/src
-    integrator.py           communicates with integrations, syncing pricing and availability changes
-    server.py               exposes the dataset through an api
-    /integrations           contains scripts with a consistent interface to retrieve updates from each data source
-        data-source-1.py
-        data-source-2.py
-    /seed                   contains a dataset from each data source to seed the database
-        data-source-1.csv
-    
+#### data schemas
+```sql
+CREATE TABLE products (
+    sku VARCHAR(20) PRIMARY KEY,           
+    name VARCHAR(40) NOT NULL,
+    price FLOAT NOT NULL,
+    brand VARCHAR(40) NOT NULL,
+    availability VARCHAR(10) NOT NULL,
+    release_year VARCHAR(20) NOT NULL,
+    vendor_id VARCHAR(20) NOT NULL,
+    vendor_name VARCHAR(20) NOT NULL,
+    synced_at DATE NOT NULL,
+    created_at DATE NOT NULL,
+)
 ```
+
+#### setup
+todo: outline steps to get running in a Docker container or to deploy everything into a cluster

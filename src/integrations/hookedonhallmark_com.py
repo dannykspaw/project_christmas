@@ -58,7 +58,7 @@ def get_year_links(driver):
     return year_links
 
 
-def get_ornaments(driver, url, links={}):
+def get_ornament_links_by_year(driver, url, links={}):
     driver.get(url)
 
     ornament_blocks = driver.find_elements_by_class_name("product-item")
@@ -104,7 +104,7 @@ def get_ornaments(driver, url, links={}):
             raise Exception('no new page link found')
 
         print('next page link found: {}'.format(next_page_link))
-        get_ornaments(driver, next_page_link, links)
+        get_ornament_links_by_year(driver, next_page_link, links)
     except Exception as err:
         print('no next page found from url: {} err {}'.format(url, err))
 
@@ -178,7 +178,7 @@ if __name__ == "__main__":
 
         # get all the product links for this year
         product_links = {}
-        get_ornaments(driver, url, product_links)
+        get_ornament_links_by_year(driver, url, product_links)
 
         i = 0
         count = len(product_links)

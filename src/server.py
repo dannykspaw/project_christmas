@@ -1,8 +1,8 @@
-# gives the data to the people
+# gives the data to the poor
 
 # exposes an api
 # also talks with the db to read entries
 
-from db import connect
+from utils.postgres import connect
 
 conn = connect()
