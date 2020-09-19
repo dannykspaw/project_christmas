@@ -1,1 +1,1 @@
-# gives the data
+# gives the data to the people
