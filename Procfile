@@ -1,1 +1,0 @@
-worker: python ./integrations/ornament_shop_com.py
