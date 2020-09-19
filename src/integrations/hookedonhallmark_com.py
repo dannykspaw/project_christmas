@@ -14,7 +14,8 @@ COLUMNS=[
     "Product Availability",
     "Product Id",
     "Product Release Year",
-    "Product Vendor"
+    "Product Vendor",
+    "Product Link"
 ]
 
 
@@ -128,6 +129,7 @@ def get_ornament_details(driver, link, year):
     ornament_details["Product Id"] = id_element.get_attribute('value')
     ornament_details["Product Release Year"] = year
     ornament_details["Product Vendor"] = "hookedonhallmark.com"
+    ornament_details["Product Link"] = link
 
     return ornament_details
     

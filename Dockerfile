@@ -14,13 +14,13 @@ RUN unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
 # set display port to avoid crash
 ENV DISPLAY=:99
 
-RUN mkdir ./src/seed
+WORKDIR /usr
 ENV CACHE=./src/seed/ornament_shop_com.csv
 
 COPY requirements.txt /requirements.txt
 RUN pip install --upgrade setuptools
 RUN pip install -r /requirements.txt
 
-COPY ./integrations ./integrations
+ADD ./src /usr/src
 
 CMD ["python", "./src/integrations/ornament_shop_com.py"]
