@@ -1,25 +1,23 @@
 from os import getenv
 import psycopg2
+from .config import config
 
 
 def connect():
-    print('connecting to the db')
+    print('Connecting to postgres...')
 
     # connect to the db
+    pg = config.postgres
     connect = psycopg2.connect(
-        host = getenv('POSTGRES_HOST'),
-        database = getenv('POSTGRES_NAME'),
-        user = getenv('POSTGRES_USER'),
-        password = getenv('POSTGRES_PASSWORD')
+        host = pg.host,
+        database = pg.database,
+        user = pg.user,
+        password = pg.password
     )
-    print('host', getenv('POSTGRES_HOST'))
-    print('database', getenv('POSTGRES_NAME'))
-    print('user', getenv('POSTGRES_USER'))
-    print('password', getenv('POSTGRES_PASSWORD'))
 
     # create tables if they don't exist
     
-    print(str(connect.closed).replace("0","Connected to {}...".format(getenv('POSTGRES_DATABASE'))))
+    print(str(connect.closed).replace("0","Connected to {}...".format(pg.database)))
 
     # return the database cursor
     return connect.cursor()
