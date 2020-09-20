@@ -86,6 +86,13 @@
         - [] what are they?
     - [] authn/authz
         - api keys?
+- [] models
+    - [] define base model class
+        - [] pre hooks
+        - [] post hooks
+        - [] default crud operations
+    - [] define products class
+        - [] based on base model
 - [x] config
     - [x] support for using a json config
     - [x] global config module that loads once on startup
