@@ -4,7 +4,7 @@
 - [x] container configured (Dockerfile)
 - [x] Heroku configured (heroku.yml)
 - [x] package management configured (requirements.txt)
-- [] integrations
+- [ ] integrations
     - [] all integration modules loaded on startup
         - [] remove './src/integrations/__init__.py' file
         - [] replace with process that loads all without explicityly naming each module
