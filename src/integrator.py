@@ -31,8 +31,10 @@ def sync_by_query(query=None):
 def sync_by_url(vendor=None, url=None):
     '''takes a vendor and url and attempts to create a fully qualified product'''
 
-    # when this url is found, add it to a redis set namespaced by vendor
-    # create a scheduled job that runs once every 30 minutes that iterates this new list and scrapes it
+    # take all new urls and put them in a list using a strategy from https://redis.io/topics/mass-insert
+    # create a scheduled job that runs once every 30 minutes that iterates this new list and scrapes the new products
+
+    # or make it really simple and scrape the page when it's found :shrug_emoji:
 
     pass
 

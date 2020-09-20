@@ -4,7 +4,6 @@ import json
 
 config = None
 
-
 def __json_to_config(config):
     """
     Convert dictionary into instance allowing access to dictionary keys using
