@@ -47,11 +47,7 @@
     - [x] is aware of supported integrations
         - [x] raises an Exception if unsupported integration selected
         - [x] gets supported integrations without parsing directory (uses modules)
-    - [ ] is aware of unsupported functions in each integration
-        - [ ] uses integration interface to build support tree
-        - [ ] uses support tree to validate integration requests
-        - [ ] modularized for integration interface control (toggle on/off by integration/method)
-    - [ ] can sync products from each integration (this can be validated with the item from above)
+    - [ ] can sync products from each integration
         - [ ] by id
             - [ ] hookedonhallmark_com
             - [ ] ornament_shop_com
@@ -91,26 +87,11 @@
         - [ ] what are they?
     - [ ] authn/authz
         - api keys?
-- [ ] models
-    - [ ] define base model class
-        - [ ] pre hooks
-        - [ ] post hooks
-        - [ ] default crud operations
-    - [ ] define products class
-        - [ ] based on base model
-- [x] config
-    - [x] support for using a json config
-    - [x] global config module that loads once on startup
-    - [x] dot-notation access to nested variables
-- [ ] logging
-    - [ ] abstracted all logging into module
-    - [ ] support for timestamps/module tags
-    - [ ] support for modified color output by module/service
 
 #### environment variables
 ```bash
 ENV (optionsal) default is 'default'
-CONFIG_PATH (optional) defaults is './src/config/$ENV.json'
+CONFIG_PATH (optional) default is './src/config/$ENV.json'
 ```
 
 #### data schemas
