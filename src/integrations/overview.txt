@@ -1,0 +1,10 @@
+__pycache__
+
+Automatically created when you have python files in that directory being referenced by an integrator script.
+
+__init__.py
+
+This allows for us to call all 3 integrator files instead of each one individually
+
+The "from ." means go to the folders outside of this directory.
+

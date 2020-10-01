@@ -1,0 +1,24 @@
+config.py
+
+Step 1: Give script ability to read json config from src folder
+Step 2: Specify the location of the src folder
+Step 3: Set the global configuration for the overall system to the config found in config json file
+
+Instantiation of env and base config paths are ways to say "Hey, if this doesn't exist as a context (e.g. an environment) or if your config path is not specified, here is a reminder"
+
+Environment variable is global, so this would help switch all workflows across repo given everything can reference your environment variables.
+
+postgres.py:
+
+1: Referencing the config variable in the config.py file that was generated
+2: Connecting to DB using the config variables found within Postgres config section
+3: Return a cursor that helps execute commands against DB. We return it because this file just spits out your tool to do things with the database.
+
+selenium.py:
+1. Creates driver using default options for selenium and condenses driver + options into single variable
+
+
+redis.py:
+1. This would serve as the record for vendor syncs (basically our cache for system metadata)
+
+Best practice to not push configs before going live
