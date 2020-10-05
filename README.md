@@ -5,6 +5,11 @@
 
 # project_christmas
 
+
+#### architecture
+
+![architecture](./images/architecture.png?raw=true "High-Level Architecture")
+
 #### tasks
 - [x] container configured (Dockerfile)
 - [x] Heroku configured (heroku.yml)
