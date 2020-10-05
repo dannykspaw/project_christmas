@@ -22,20 +22,20 @@
         - [x] hookedonhallmark_com
         - [x] ornament_shop_com
         - [x] hallmark_ornaments_com
-    - [ ] interface
-        - [ ] defined
-            - get ornaments by year
-            - get ornament by name/link (can the integration generate the full link)
-        - [ ] using interface
-            - [ ] hookedonhallmark_com
-            - [ ] ornament_shop_com
-            - [ ] hallmark_ornaments_com
-        - [ ] refactor
-            - [ ] year links cached (using utils.redis)
-            - [x] selenium webdriver creation abstracted to utils.selenium file
-            - [ ] use global driver instance (utils.selenium.driver)
-            - [ ] global driver is created for each integration
-            - [ ] csv caching removed
+    - [x] interface
+        - [x] defined
+            - get_ornaments_by_year(year)
+            - get_ornament_by_url(url)
+        - [x] using interface
+            - [x] hookedonhallmark_com
+            - [x] ornament_shop_com
+            - [x] hallmark_ornaments_com
+    - [ ] refactor
+        - [ ] year links cached (using utils.redis)
+        - [x] selenium webdriver creation abstracted to utils.selenium file
+        - [ ] use global driver instance (utils.selenium.driver)
+        - [ ] global driver is created for each integration
+        - [ ] csv caching removed
 - [ ] databases
     - [ ] postgresql
         - [x] utility module created
