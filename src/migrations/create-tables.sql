@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS products (
     id VARCHAR(24) PRIMARY KEY,
-    vendor VARCHAR(24) FOREIGN KEY,
+    vendor VARCHAR(24) NOT NULL,
     sku VARCHAR(20) NOT NULL,
     name VARCHAR(40) NOT NULL,
     price FLOAT NOT NULL,
@@ -10,5 +10,5 @@ CREATE TABLE IF NOT EXISTS products (
     vendor_id VARCHAR(20) NOT NULL,
     link VARCHAR(100) NOT NULL,
     last_synced_at DATE NOT NULL,
-    created_at DATE NOT NULL,
+    created_at DATE NOT NULL
 )

@@ -1,6 +1,6 @@
 from os import path
 import psycopg2
-from .config import config  
+from .config import config
 
 
 def connect():
