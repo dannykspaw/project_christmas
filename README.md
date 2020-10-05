@@ -102,12 +102,6 @@ CREATE TABLE products (
     created_at DATE NOT NULL,
 )
 
-CREATE TABLE vendors (
-    id VARCHAR(24) PRIMARY KEY,
-    name VARCHAR(40) NOT NULL,
-    last_synced_at DATE NOT NULL,
-)
-
 ```
 
 #### setup

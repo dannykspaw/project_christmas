@@ -1,5 +1,6 @@
+from os import path
 import psycopg2
-from .config import config
+from .config import config  
 
 
 def connect():
@@ -14,9 +15,12 @@ def connect():
         password = pg.password
     )
 
+    cursor = connect.cursor()
+
     # create tables if they don't exist
+    cursor.execute(open('{}/src/migrations/create-tables.sql'.format(path.curdir), 'r').read())
     
     print(str(connect.closed).replace("0","Connected to {}...".format(pg.database)))
 
     # return the database cursor
-    return connect.cursor()
+    return cursor
