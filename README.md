@@ -5,10 +5,11 @@
 
 # project_christmas
 
+#### architecture
+
+![architecture](./images/architecture.png?raw=true "High-Level Architecture")
+
 #### tasks
-- [x] container configured (Dockerfile)
-- [x] Heroku configured (heroku.yml)
-- [x] package management configured (requirements.txt)
 - [ ] integrations
     - [ ] all integration modules loaded on startup
         - [ ] remove './src/integrations/__init__.py' file
@@ -17,20 +18,20 @@
         - [x] hookedonhallmark_com
         - [x] ornament_shop_com
         - [x] hallmark_ornaments_com
-    - [ ] interface
-        - [ ] defined
-            - get ornaments by year
-            - get ornament by name/link (can the integration generate the full link)
-        - [ ] using interface
-            - [ ] hookedonhallmark_com
-            - [ ] ornament_shop_com
-            - [ ] hallmark_ornaments_com
-        - [ ] refactor
-            - [ ] year links cached (using utils.redis)
-            - [x] selenium webdriver creation abstracted to utils.selenium file
-            - [ ] use global driver instance (utils.selenium.driver)
-            - [ ] global driver is created for each integration
-            - [ ] csv caching removed
+    - [x] interface
+        - [x] defined
+            - get_ornaments_by_year(year)
+            - get_ornament_by_url(url)
+        - [x] using interface
+            - [x] hookedonhallmark_com
+            - [x] ornament_shop_com
+            - [x] hallmark_ornaments_com
+    - [ ] refactor
+        - [ ] year links cached (using utils.redis)
+        - [x] selenium webdriver creation abstracted to utils.selenium file
+        - [ ] use global driver instance (utils.selenium.driver)
+        - [ ] global driver is created for each integration
+        - [ ] csv caching removed
 - [ ] databases
     - [ ] postgresql
         - [x] utility module created
@@ -44,22 +45,11 @@
         - [ ] connection parameterized using environment variables
         - [ ] logs piped to centralized location
 - [ ] integrator
-    - [x] is aware of supported integrations
-        - [x] raises an Exception if unsupported integration selected
-        - [x] gets supported integrations without parsing directory (uses modules)
     - [ ] can sync products from each integration
         - [ ] by id
-            - [ ] hookedonhallmark_com
-            - [ ] ornament_shop_com
-            - [ ] hallmark_ornaments_com
         - [ ] by year
-            - [ ] hookedonhallmark_com
-            - [ ] ornament_shop_com
-            - [ ] hallmark_ornaments_com
         - [ ] by vendor
-            - [ ] hookedonhallmark_com
-            - [ ] ornament_shop_com
-            - [ ] hallmark_ornaments_com
+    - [ ] can insert new products into database
 - [ ] scheduler
     - [ ] APScheduler validation
         - [x] jobs are created

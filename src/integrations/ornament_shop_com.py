@@ -6,6 +6,7 @@ from utils.config import config
 from utils.selenium import driver
 
 
+integration_name = path.basename(__file__).replace('.py', '')
 COLUMNS=[
     "Product Code",
     "Product Name",
@@ -45,7 +46,10 @@ def get_year_links():
     return year_links
 
 
-def get_ornaments_by_year(url, links={}):
+year_links = get_year_links()
+
+
+def __get_ornament_links_by_year(url, links={}):
     driver.get(url)
     ornament_blocks = driver.find_elements_by_class_name("card")
 
@@ -68,12 +72,27 @@ def get_ornaments_by_year(url, links={}):
         next_page_link = next_page_block.find_element_by_tag_name('a').get_attribute('href')
         
         print('next page link found: {}'.format(next_page_link))
-        get_ornaments_by_year(next_page_link, links)
+        __get_ornament_links_by_year(next_page_link, links)
     except:
         print('no next page found from url: {}'.format(url))
+        return links
 
 
-def get_ornament(link):
+def get_ornaments_by_year(year):
+    year = str(year)
+    year_link = year_links[year]
+    products = __get_ornament_links_by_year(year_link)
+    ornaments_df = pd.DataFrame(columns=COLUMNS)
+
+    for link in products.values():
+        ornament_df = get_ornament_by_url(link)
+        ornament_df['Product Release Year'] = year
+        ornaments_df = ornaments_df.append(ornament_df, ignore_index=True)
+
+    return ornaments_df
+
+
+def get_ornament_by_url(link):
     # navigate to the ornament details page
     driver.get(link)
 
@@ -93,25 +112,21 @@ def get_ornament(link):
     ornament_details["Product Brand"] = brand_element.text
     ornament_details["Product Availability"] = availability_element.text
     ornament_details["Product Id"] = id_element.get_attribute('value')
-
-    # todo: find the release year on the page
-    # ornament_details["Product Release Year"] = year
-
-    ornament_details["Product Vendor"] = "ornament-shop.com"
+    ornament_details["Product Vendor"] = integration_name
     ornament_details["Product Link"] = link
 
-    return ornament_details
+    ornament_df = pd.DataFrame(ornament_details, index=[0])
+    return ornament_df
 
 
 if __name__ == "__main__":
     # todo: cache the year links between starts
-    years = get_year_links()
-    for year, url in years.items():
+    for year, url in year_links.items():
         print('getting product links for year {} link {}'.format(year, url))
 
         # get all the product links for this year
         product_links = {}
-        get_ornaments_by_year(url, product_links)
+        __get_ornament_links_by_year(url, product_links)
 
         i = 0
         count = len(product_links)
@@ -120,4 +135,4 @@ if __name__ == "__main__":
             print('{}/{} {} - getting details for {} at link {}'.format(i, count, year, product, link))
 
             # get the ornament details for this link
-            product_details = get_ornament(link)
+            product_details = get_ornament_by_url(link)
