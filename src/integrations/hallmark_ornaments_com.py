@@ -100,6 +100,3 @@ def get_ornaments_by_year(year):
     return ornaments_df
 
 #get number of products
-
-
-driver.quit()
