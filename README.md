@@ -5,15 +5,11 @@
 
 # project_christmas
 
-
 #### architecture
 
 ![architecture](./images/architecture.png?raw=true "High-Level Architecture")
 
 #### tasks
-- [x] container configured (Dockerfile)
-- [x] Heroku configured (heroku.yml)
-- [x] package management configured (requirements.txt)
 - [ ] integrations
     - [ ] all integration modules loaded on startup
         - [ ] remove './src/integrations/__init__.py' file
@@ -53,6 +49,7 @@
         - [ ] by id
         - [ ] by year
         - [ ] by vendor
+    - [ ] can insert new products into database
 - [ ] scheduler
     - [ ] APScheduler validation
         - [x] jobs are created
