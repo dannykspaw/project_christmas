@@ -10,6 +10,11 @@ postgres = connect()
 def sync_by_id(id=None):
     '''finds the product by id and calls the associated integration to update it using the product url'''
 
+    # 1. get the product in the database with this id
+    # 2. get the integration that the product is associated with (get_integration_by_name)
+    # 3. use the integration to fetch the current product details
+    # 4. update the database
+
     pass
 
 
