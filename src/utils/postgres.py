@@ -14,13 +14,11 @@ def connect():
         user = pg.user,
         password = pg.password
     )
-
+    print(str(connect.closed).replace("0","Connected to {}...".format(pg.database)))
     cursor = connect.cursor()
 
     # create tables if they don't exist
     cursor.execute(open('{}/src/migrations/create-tables.sql'.format(path.curdir), 'r').read())
-    
-    print(str(connect.closed).replace("0","Connected to {}...".format(pg.database)))
 
     # return the database cursor
     return cursor
