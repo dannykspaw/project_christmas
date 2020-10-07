@@ -15,12 +15,9 @@ RUN unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
 ENV DISPLAY=:99
 
 WORKDIR /usr
-ENV CACHE=./src/seed/ornament_shop_com.csv
 
 COPY requirements.txt /requirements.txt
 RUN pip install --upgrade setuptools
 RUN pip install -r /requirements.txt
 
-ADD ./src /usr/src
-
-CMD ["python", "./src/integrations/ornament_shop_com.py"]
+ADD ./src /usr
