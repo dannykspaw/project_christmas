@@ -11,9 +11,6 @@
 
 #### tasks
 - [ ] integrations
-    - [ ] all integration modules loaded on startup
-        - [ ] remove './src/integrations/__init__.py' file
-        - [ ] replace with process that loads all without explicityly naming each module
     - [x] prototypes
         - [x] hookedonhallmark_com
         - [x] ornament_shop_com
@@ -39,20 +36,19 @@
         - [ ] initialization method
             - creates database?
             - creates tables from schema IF NOT EXISTS
-        - [ ] logs piped to centralized location
     - [ ] redis
         - [x] utility module created
         - [ ] connection parameterized using environment variables
-        - [ ] logs piped to centralized location
 - [ ] integrator
     - [ ] can sync products from each integration
         - [ ] by id
         - [ ] by year
         - [ ] by vendor
+        - [ ] by query
     - [ ] can insert new products into database
 - [ ] scheduler
-    - [ ] celery configuration
-    - [ ] 
+    - [x] celery configuration
+    - [ ] setup reccurring tasks
 - [ ] auditor
     - [ ] postgres "change streams" pubsub setup
         - [ ] setup process documented
@@ -75,9 +71,9 @@ CONFIG_PATH (optional) default is './config/$ENV.json'
 #### data schemas
 ```sql
 
-CREATE TABLE products (
+CREATE TABLE IF NOT EXISTS products (
     id VARCHAR(24) PRIMARY KEY,
-    vendor VARCHAR(24) FOREIGN KEY,
+    vendor VARCHAR(24) NOT NULL,
     sku VARCHAR(20) NOT NULL,
     name VARCHAR(40) NOT NULL,
     price FLOAT NOT NULL,
@@ -87,11 +83,43 @@ CREATE TABLE products (
     vendor_id VARCHAR(20) NOT NULL,
     link VARCHAR(100) NOT NULL,
     last_synced_at DATE NOT NULL,
-    created_at DATE NOT NULL,
+    created_at DATE NOT NULL
 )
 
 ```
 
 #### setup
 - start celery worker for integrator `celery -A integrator worker --loglevel=INFO`
+```shell
+loading default config from /Users/tblake/Documents/project_christmas/src/config
+Connecting to postgres...
+Connected to ornaments...
+ 
+ -------------- celery@terrans-mbp-2.lan v5.0.0 (singularity)
+--- ***** ----- 
+-- ******* ---- macOS-10.15.6-x86_64-i386-64bit 2020-10-07 14:43:44
+- *** --- * --- 
+- ** ---------- [config]
+- ** ---------- .> app:         ornaments:0x103785880
+- ** ---------- .> transport:   redis://localhost:6379//
+- ** ---------- .> results:     disabled://
+- *** --- * --- .> concurrency: 8 (prefork)
+-- ******* ---- .> task events: OFF (enable -E to monitor tasks in this worker)
+--- ***** ----- 
+ -------------- [queues]
+                .> celery           exchange=celery(direct) key=celery
+```
 - start celery scheduler `celery -A utils.celery beat`
+```shell
+loading default config from /Users/tblake/Documents/project_christmas/src/config
+celery beat v5.0.0 (singularity) is starting.
+__    -    ... __   -        _
+LocalTime -> 2020-10-07 14:43:24
+Configuration ->
+    . broker -> redis://localhost:6379//
+    . loader -> celery.loaders.app.AppLoader
+    . scheduler -> celery.beat.PersistentScheduler
+    . db -> celerybeat-schedule
+    . logfile -> [stderr]@%WARNING
+    . maxinterval -> 5.00 minutes (300s)
+```

@@ -1,8 +1,18 @@
 {
+    "env": "default",
     "postgres": {
         "host": "localhost",
         "port": 5432,
-        "database": "default",
-        "user": "postgres"
+        "database": "database",
+        "user": "user",
+        "password": "password"
+    },
+    "redis": {
+        "host": "localhost",
+        "port": 6379,
+        "db": 0
+    },
+    "scheduler": {
+        "timezone": "UTC"
     }
 }
