@@ -18,7 +18,7 @@ def connect():
     cursor = connect.cursor()
 
     # create tables if they don't exist
-    cursor.execute(open('{}/src/migrations/create-tables.sql'.format(path.curdir), 'r').read())
+    cursor.execute(open('{}/migrations/create-tables.sql'.format(path.curdir), 'r').read())
 
     # return the database cursor
     return cursor

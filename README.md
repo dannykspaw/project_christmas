@@ -51,24 +51,12 @@
         - [ ] by vendor
     - [ ] can insert new products into database
 - [ ] scheduler
-    - [ ] APScheduler validation
-        - [x] jobs are created
-        - [ ] jobs are created with accurate triggers (interval, date, event)
-        - [ ] jobs are persistent between restarts
-    - [ ] jobs can be generated
-        - [ ] daily job to sync each vendor by year
-            - create a job for each year for each vendor
-            - vendor * years
-    - [ ] jobs are being fired on time
-        - test interval-based jobs
-        - test schedule-based jobs
+    - [ ] celery configuration
+    - [ ] 
 - [ ] auditor
     - [ ] postgres "change streams" pubsub setup
         - [ ] setup process documented
         - [ ] setup process automated
-    - [ ] pubsub validation
-        - [ ] changes can be filtered by table
-        - [ ] changes are propogated immediately
     - [ ] audit functionality
         - [ ] price history is tracked over time
         - [ ] config to toggle more fields on
@@ -81,7 +69,7 @@
 #### environment variables
 ```bash
 ENV (optionsal) default is 'default'
-CONFIG_PATH (optional) default is './src/config/$ENV.json'
+CONFIG_PATH (optional) default is './config/$ENV.json'
 ```
 
 #### data schemas
@@ -105,5 +93,5 @@ CREATE TABLE products (
 ```
 
 #### setup
-- [ ] prerequisites
-- [ ] configurations
+- start celery worker for integrator `celery -A integrator worker --loglevel=INFO`
+- start celery scheduler `celery -A utils.celery beat`

@@ -29,11 +29,9 @@ def __json_to_config(config):
 
 
 env = getenv('ENV', 'default')
-base_config_path = getenv('CONFIG_PATH', './src/config/')
+base_config_path = getenv('CONFIG_PATH', './config/')
 absolute_base_config_path = path.abspath(base_config_path)
-config_path = '{}{}.json'.format(base_config_path, env)
-
-print(absolute_base_config_path)
+config_path = '{}/{}.json'.format(absolute_base_config_path, env)
 
 print('loading {} config from {}'.format(env, absolute_base_config_path))
 with open(config_path, 'r') as read_file:
