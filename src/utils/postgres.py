@@ -11,6 +11,7 @@ connect = psycopg2.connect(
     database = pg.database,
     user = pg.user,
     password = pg.password
+)
 print(str(connect.closed).replace("0","Connected to {}...".format(pg.database)))
 cursor = connect.cursor()
 
