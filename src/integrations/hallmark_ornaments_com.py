@@ -78,7 +78,8 @@ def get_ornaments_by_year(year):
         num_of_products = quantity.text[26:]
         print(year)
         quick_view_links = []
-    except:
+    except Exception as e:
+        print(e)
         year += 1
     #create quick view links within year
     for x in range(1,int(num_of_products)+1):

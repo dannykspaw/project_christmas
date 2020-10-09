@@ -1,3 +1,4 @@
+import pkgutil
 from utils.config import config
 from utils.postgres import cursor, connect
 
@@ -44,37 +45,43 @@ def sync_by_id(id=None):
     connect.commit()
 
 
+def sync_integration_by_year(integration_name, year):
+    integration = get_integration_by_name(integration_name)
+    years = integration.year_links.keys()
+    products = None
+
+    if year in years:
+        products = integration.get_ornaments_by_year(str(year))
+    else:
+        print('integration {} does not support year {}'.format(integration, year))
+        return
+
+    # todo: handle duplicates
+    # if duplicate, update by id
+    
+    # build an insert statement for array of products
+    values = ''
+    for product in products.to_dict(orient='records'):
+        value = ','.join(product.values())
+        values += '({}),'.format(value)
+
+    insert_statement = '''
+        INSERT INTO 
+            products (id, vendor, sku, name, price, brand, availability, release_year, vendor_id, link, last_synced_at, created_at)
+        VALUES
+            {}
+    '''.format(values)
+
+    print('inserting {} products into database'.format(len(products)))
+    pg.execute(insert_statement)
+    connect.commit()
+    
+
 def sync_by_year(year=None):
     '''takes a year and syncs all integrations by year'''
-    for integration in integrations:
-        years = integration.year_links.keys()
-        products = None
-
-        if year in years:
-            products = integration.get_ornaments_by_year(str(year))
-        else:
-            print('integration {} does not support year {}'.format(integration, year))
-            return
-            
-        # todo: handle duplicates
-        # if duplicate, update by id
-        
-        # build an insert statement for array of products
-        values = ''
-        for product in products:
-            value = ','.join(product.to_dict.values())
-            values += '({}),'.format(value)
-
-        insert_statement = '''
-            INSERT INTO 
-                products (id, vendor, sku, name, price, brand, availability, release_year, vendor_id, link, last_synced_at, created_at)
-            VALUES
-                {}
-        '''.format(values)
-
-        print('inserting {} products into database'.format(len(products)))
-        pg.execute(insert_statement)
-        connect.commit()
+    integrations_list = [name for _, name, _ in pkgutil.iter_modules(['integrations'])]
+    for integration in integrations_list:
+        sync_integration_by_year(integration, year)
 
 
 def sync_by_vendor(vendor=None):
@@ -99,3 +106,7 @@ def get_integration_by_name(key=None):
         raise Exception('integration {} is not supported'.format(key))
 
     return __import__('integrations.{}'.format(key), fromlist=[integrations])
+
+
+if __name__ == "__main__":
+    sync_by_year('1975')
