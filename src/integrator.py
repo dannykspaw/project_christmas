@@ -62,14 +62,14 @@ def sync_integration_by_year(integration_name, year):
         print('no products were returned from integration {} bailing!'.format(integration_name))
         return
 
-    # todo: handle duplicates
+    # todo: handle duplicates -- lookup where (sku & vendor & year) <- index?
     # if duplicate, update by id
     
     # build an insert statement for array of products
     values = []
     for product in n_products.to_dict(orient='records'):
-        value = ','.join(['\'{}\''.format(x) for x in product.values()])
-        values.append('({})'.format(value))
+        value = __dict_to_values(product)
+        values.append(value)
 
     # todo: fill in missing fields, rearrange to match schema and convert to correct data type
 
@@ -93,6 +93,12 @@ def sync_by_vendor(vendor=None):
     '''takes a vendor and attempts to create a fully qualified product'''
 
     pass
+
+
+def __dict_to_values(dict):
+    '''converts a dictionary and converts it's values into the values portion of an sql insert statement'''
+    # https://repl.it/@terranblake/DeeppinkWeepyComputing#main.py
+    return '(' + ','.join(['\'{}\''.format(x) for x in dict.values()]) + ')'
 
 
 def __is_supported_integration(key=None):
