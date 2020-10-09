@@ -109,7 +109,7 @@ Connected to ornaments...
  -------------- [queues]
                 .> celery           exchange=celery(direct) key=celery
 ```
-- start celery scheduler `celery -A utils.celery beat`
+- start celery scheduler `celery -A scheduler beat`
 ```shell
 loading default config from /Users/tblake/Documents/project_christmas/src/config
 celery beat v5.0.0 (singularity) is starting.

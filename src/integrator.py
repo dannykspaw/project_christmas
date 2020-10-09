@@ -1,6 +1,7 @@
 import pkgutil
 from utils.config import config
 from utils.postgres import cursor, connect
+from utils.celery import app
 
 from integrations import *
 import integrations
@@ -56,21 +57,26 @@ def sync_integration_by_year(integration_name, year):
         print('integration {} does not support year {}'.format(integration, year))
         return
 
+    if products is None:
+        print('no products were returned from integration {} bailing!'.format(integration_name))
+        return
+
     # todo: handle duplicates
     # if duplicate, update by id
     
     # build an insert statement for array of products
-    values = ''
+    values = []
     for product in products.to_dict(orient='records'):
-        value = ','.join(product.values())
-        values += '({}),'.format(value)
+        value = ','.join(['\'{}\''.format(x) for x in product.values()])
+        values.append('({})'.format(value))
 
+    # todo: replace static definition of columns by asking postgres for columns
     insert_statement = '''
         INSERT INTO 
             products (id, vendor, sku, name, price, brand, availability, release_year, vendor_id, link, last_synced_at, created_at)
         VALUES
             {}
-    '''.format(values)
+    '''.format(','.join(values))
 
     print('inserting {} products into database'.format(len(products)))
     pg.execute(insert_statement)
@@ -92,12 +98,7 @@ def sync_by_vendor(vendor=None):
 
 def __is_supported_integration(key=None):
     '''returns whether the provided key maps to a valid integration'''
-    try:
-        __import__('integrations.{}'.format(key), fromlist=[integrations])
-    except ModuleNotFoundError:
-        return False
-
-    return True
+    return key in [name for _, name, _ in pkgutil.iter_modules(['integrations'])]
 
 
 def get_integration_by_name(key=None):
@@ -106,7 +107,3 @@ def get_integration_by_name(key=None):
         raise Exception('integration {} is not supported'.format(key))
 
     return __import__('integrations.{}'.format(key), fromlist=[integrations])
-
-
-if __name__ == "__main__":
-    sync_by_year('1975')

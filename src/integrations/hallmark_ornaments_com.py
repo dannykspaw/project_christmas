@@ -7,6 +7,8 @@ import time
 from csv import reader
 import re
 
+from utils.selenium import driver
+
 COLUMNS=[
     "Product Code",
     "Product Name",
@@ -17,12 +19,6 @@ COLUMNS=[
     "Product Vendor",
     "Product Link"
 ]
-
-#Set webdriver options
-options = Options()
-options.headless = True
-options.add_argument("--window-size=1920,1200")
-driver = webdriver.Chrome(options=options)
 
 action = ActionChains(driver)
 

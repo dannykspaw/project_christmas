@@ -25,24 +25,24 @@ def get_year_links():
     url = 'https://www.hookedonhallmark.com/keepsake-hallmark-ornaments-by-year.html'
     driver.get(url)
 
-    content_blocks = driver.find_elements_by_class_name("sub-categories")
+    content_blocks = driver.find_elements_by_class_name("columns-5")
     year_links = {}
 
-    for block in content_blocks:
-        element = block.find_element_by_tag_name("a")
-        year_link = element.get_attribute("href")
+    for content in content_blocks:
+        for block in content.find_elements_by_tag_name("li"):
+            element = block.find_element_by_tag_name("a")
+            year_link = element.get_attribute("href")
+            name_span = block.find_element_by_tag_name("span")
 
-        name_span = block.find_element_by_tag_name("span")
+            try:
+                year_img = name_span.find_element_by_tag_name("img")
+                img_alt = year_img.get_attribute("alt")
+                segments = img_alt.split(' ')
+            except:
+                segments = name_span.text.split(' ')
 
-        try:
-            year_img = name_span.find_element_by_tag_name("img")
-            img_alt = year_img.get_attribute("alt")
-            segments = img_alt.split(' ')
-        except:
-            segments = name_span.text.split(' ')
-
-        year = segments[0]
-        year_links[year] = year_link
+            year = segments[0]
+            year_links[year] = year_link
 
     return year_links
 
