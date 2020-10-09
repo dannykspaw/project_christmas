@@ -5,7 +5,7 @@ from integrations import *
 import integrations
 
 
-pg = connect()
+pg = cursor
 
 def sync_by_id(id=None):
     '''finds the product by id and calls the associated integration to update it using the product url'''
