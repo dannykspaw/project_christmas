@@ -3,6 +3,7 @@ from utils.config import config
 from utils.postgres import cursor, connect
 from utils.celery import app
 
+from models import products
 from integrations import *
 import integrations
 
@@ -49,15 +50,15 @@ def sync_by_id(id=None):
 def sync_integration_by_year(integration_name, year):
     integration = get_integration_by_name(integration_name)
     years = integration.year_links.keys()
-    products = None
+    n_products = None
 
     if year in years:
-        products = integration.get_ornaments_by_year(str(year))
+        n_products = integration.get_ornaments_by_year(str(year))
     else:
         print('integration {} does not support year {}'.format(integration, year))
         return
 
-    if products is None:
+    if n_products is None:
         print('no products were returned from integration {} bailing!'.format(integration_name))
         return
 
@@ -66,17 +67,15 @@ def sync_integration_by_year(integration_name, year):
     
     # build an insert statement for array of products
     values = []
-    for product in products.to_dict(orient='records'):
+    for product in n_products.to_dict(orient='records'):
         value = ','.join(['\'{}\''.format(x) for x in product.values()])
         values.append('({})'.format(value))
 
+    # todo: fill in missing fields, rearrange to match schema and convert to correct data type
+
     # todo: replace static definition of columns by asking postgres for columns
-    insert_statement = '''
-        INSERT INTO 
-            products (id, vendor, sku, name, price, brand, availability, release_year, vendor_id, link, last_synced_at, created_at)
-        VALUES
-            {}
-    '''.format(','.join(values))
+    #       or creating a models folder that defines the columns and operations
+    insert_statement = 'INSERT INTO products {} VALUES {}'.format(products.columns, ','.join(values))
 
     print('inserting {} products into database'.format(len(products)))
     pg.execute(insert_statement)
