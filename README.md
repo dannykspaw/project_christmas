@@ -66,6 +66,6 @@ CREATE TABLE IF NOT EXISTS products (
 ```
 
 #### setup
-- naviagate to `./src/` folder
+- navigate to `./src/` folder
 - start celery worker `celery -A integrator worker --loglevel=INFO`
 - start celery scheduler `celery -A scheduler beat`

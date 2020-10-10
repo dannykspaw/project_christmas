@@ -80,7 +80,7 @@ def sync_integration_by_year(integration_name, year):
     print('inserting {} products into database'.format(len(products)))
     pg.execute(insert_statement)
     connect.commit()
-    
+
 
 def sync_by_year(year=None):
     '''takes a year and syncs all integrations by year'''

@@ -5,20 +5,11 @@ import pandas as pd
 
 from utils.selenium import driver
 from utils.config import config
+from ..models import products
 
 
 integration_name = path.basename(__file__).replace('.py', '')
-COLUMNS=[
-    "Product Code",
-    "Product Name",
-    "Product Price",
-    "Product Brand",
-    "Product Availability",
-    "Product Id",
-    "Product Release Year",
-    "Product Vendor",
-    "Product Link"
-]
+COLUMNS=products.columns
 
 
 def get_year_links():
@@ -129,14 +120,14 @@ def get_ornament_by_url(link):
 
     # make sure that there is a column for everything in the schema
     ornament_details = dict.fromkeys(COLUMNS, None)
-    ornament_details["Product Code"] = sku_element.text
-    ornament_details["Product Price"] = price_element.text
-    ornament_details["Product Brand"] = brand_element
-    ornament_details["Product Availability"] = availability_element.text
-    ornament_details["Product Name"] = name_element.text
-    ornament_details["Product Id"] = id_element.get_attribute('value')
-    ornament_details["Product Vendor"] = integration_name
-    ornament_details["Product Link"] = link
+    ornament_details["sku"] = sku_element.text
+    ornament_details["price"] = price_element.text
+    ornament_details["brand"] = brand_element
+    ornament_details["availability"] = availability_element.text
+    ornament_details["name"] = name_element.text
+    # ornament_details["Product Id"] = id_element.get_attribute('value')
+    ornament_details["vendor"] = integration_name
+    ornament_details["link"] = link
     
     ornament_df = pd.DataFrame(ornament_details, index=[0])
     return ornament_df
