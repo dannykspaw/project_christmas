@@ -10,16 +10,8 @@ from models import products
 
 from utils.selenium import driver
 
-COLUMNS=[
-    "Product Code",
-    "Product Name",
-    "Product Price",
-    "Product Brand",
-    "Product Availability",
-    "Product Id",
-    "Product Vendor",
-    "Product Link"
-]
+integration_name = path.basename(__file__).replace('.py', '')
+COLUMNS=products.columns
 
 action = ActionChains(driver)
 
@@ -58,9 +50,9 @@ def get_ornament_by_url(link):
     product_availability = sku_price_split.split("availability:")[1].split(",currency")[0].replace("0","Not In Stock").replace("1","In Stock")
     product_brand = "Hallmark"
     product_id = sku_name_code_split.split("catalogid:")[1].split(",id")[0]
-    product_vendor = "hallmarkornaments.com"
+    product_vendor = integration_name
     product_link = driver.current_url
-    product_info={"Product Code":product_code,"Product Name":product_name,"Product Price":product_price,"Product Availability":product_availability,"Product Brand":product_brand,"Product Id":product_id,"Product Vendor":product_vendor,"Product Link":product_link}
+    product_info={"sku":product_code,"name":product_name,"price":product_price,"availability":product_availability,"brand":product_brand,"vendor":product_vendor,"link":product_link}
     single_product_df = single_product_df.append(product_info,ignore_index=True,sort=True)
     return single_product_df
 
@@ -92,7 +84,7 @@ def get_ornaments_by_year(year):
     for link in quick_view_links:
         #run function for single link and return single link df
         single_product_df = get_ornament_by_url(link)
-        single_product_df['Product Release Year'] = year
+        single_product_df['release_year'] = year
         ornaments_df = ornaments_df.append(single_product_df,ignore_index=True,sort=True)
     return ornaments_df
 
