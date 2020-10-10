@@ -6,6 +6,7 @@ import pandas as pd
 import time
 from csv import reader
 import re
+from ..models import products
 
 from utils.selenium import driver
 
@@ -59,7 +60,6 @@ def get_ornament_by_url(link):
     product_id = sku_name_code_split.split("catalogid:")[1].split(",id")[0]
     product_vendor = "hallmarkornaments.com"
     product_link = driver.current_url
-
     product_info={"Product Code":product_code,"Product Name":product_name,"Product Price":product_price,"Product Availability":product_availability,"Product Brand":product_brand,"Product Id":product_id,"Product Vendor":product_vendor,"Product Link":product_link}
     single_product_df = single_product_df.append(product_info,ignore_index=True,sort=True)
     return single_product_df
