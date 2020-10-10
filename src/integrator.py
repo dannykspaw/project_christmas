@@ -128,3 +128,7 @@ def get_integration_by_name(key=None):
         raise Exception('integration {} is not supported'.format(key))
 
     return __import__('integrations.{}'.format(key), fromlist=[integrations])
+
+
+if __name__ == "__main__":
+    sync_by_vendor('hallmark_ornaments_com', 1974)
