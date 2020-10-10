@@ -6,7 +6,7 @@ import pandas as pd
 import time
 from csv import reader
 import re
-from ..models import products
+from models import products
 
 from utils.selenium import driver
 

@@ -5,7 +5,7 @@ import pandas as pd
 
 from utils.selenium import driver
 from utils.config import config
-from ..models import products
+from models import products
 
 
 integration_name = path.basename(__file__).replace('.py', '')
@@ -100,7 +100,7 @@ def get_ornaments_by_year(year):
 
     for link in products.values():
         ornament_df = get_ornament_by_url(link)
-        ornament_df['Product Release Year'] = year
+        ornament_df['release_year'] = year
         ornaments_df = ornaments_df.append(ornament_df, ignore_index=True)
 
     return ornaments_df

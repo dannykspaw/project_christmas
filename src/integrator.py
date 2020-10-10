@@ -1,4 +1,9 @@
 import pkgutil
+import uuid
+from datetime import datetime
+from re import sub
+from decimal import Decimal
+
 from utils.config import config
 from utils.postgres import cursor, connect
 from utils.celery import app
@@ -41,13 +46,16 @@ def sync_by_id(id=None):
         UPDATE products
         SET
             price = {},
-            availability = {}
+            availability = {},
+            last_synced_at = {},
         WHERE id = {}
-    '''.format(price, availability, id))
+    '''.format(price, availability, datetime.utcnow(), id))
     connect.commit()
 
 
 def sync_integration_by_year(integration_name, year):
+    print('syncing integration {} by year {}'.format(integration_name, year))
+
     integration = get_integration_by_name(integration_name)
     years = integration.year_links.keys()
     n_products = None
@@ -68,16 +76,19 @@ def sync_integration_by_year(integration_name, year):
     # build an insert statement for array of products
     values = []
     for product in n_products.to_dict(orient='records'):
+        # extract just the decimal from the price $29.99 -> 29.99
+        product['price'] = Decimal(sub(r'[^\d.]', '', product['price']))
+        product['id'] = str(uuid.uuid1())
+        product['last_synced_at'] = datetime.utcnow()
+        product['created_at'] = datetime.utcnow()
+
         value = __dict_to_values(product)
         values.append(value)
 
-    # todo: fill in missing fields, rearrange to match schema and convert to correct data type
+    # todo: create a models folder that defines the columns and operations
+    insert_statement = 'INSERT INTO products ({}) VALUES {}'.format(','.join(products.columns), ','.join(values))
 
-    # todo: replace static definition of columns by asking postgres for columns
-    #       or creating a models folder that defines the columns and operations
-    insert_statement = 'INSERT INTO products {} VALUES {}'.format(products.columns, ','.join(values))
-
-    print('inserting {} products into database'.format(len(products)))
+    print('inserting {} products into database'.format(len(n_products)))
     pg.execute(insert_statement)
     connect.commit()
 
@@ -89,10 +100,15 @@ def sync_by_year(year=None):
         sync_integration_by_year(integration, year)
 
 
-def sync_by_vendor(vendor=None):
+def sync_by_vendor(vendor=None, year=None):
     '''takes a vendor and attempts to create a fully qualified product'''
+    # get the integration module
+    integration = get_integration_by_name(vendor)
 
-    pass
+    # get all years this integration supports
+    years = [str(year)] if year != None else integration.year_links.keys()
+    for year in years:
+        sync_integration_by_year(vendor, year)
 
 
 def __dict_to_values(dict):

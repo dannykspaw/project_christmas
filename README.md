@@ -38,6 +38,11 @@
         - [ ] what are they?
     - [ ] authn/authz
         - api keys?
+- [ ] tests
+    - [ ] integrator
+    - [ ] integrations
+    - [ ] scheduler
+    - [ ] auditor
 
 #### environment variables
 ```bash
