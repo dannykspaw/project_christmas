@@ -115,7 +115,7 @@ def get_ornament_by_url(link):
     sku_element = driver.find_element_by_xpath('//*[@id="product_id"]')
     price_element = driver.find_element_by_xpath('//*[@id="price"]')
     availability_element = driver.find_element_by_xpath('//*[@id="availability"]')
-    id_element = driver.find_element_by_xpath('//*[@id="add"]/input[1]')
+    # id_element = driver.find_element_by_xpath('//*[@id="add"]/input[1]')
     name_element = driver.find_element_by_xpath('//*[@id="add"]/div[2]/div[2]/div[1]/h1')
 
     # make sure that there is a column for everything in the schema
@@ -131,20 +131,3 @@ def get_ornament_by_url(link):
     
     ornament_df = pd.DataFrame(ornament_details, index=[0])
     return ornament_df
-    
-
-if __name__ == "__main__":
-    for year, url in year_links.items():
-        print('getting product links for year {} link {}'.format(year, url))
-
-        # get all the product links for this year
-        product_links = __get_ornament_links_by_year(url)
-
-        i = 0
-        count = len(product_links)
-        for product, link in product_links.items():
-            i += 1
-            print('{}/{} {} - getting details for {} at link {}'.format(i, count, year, product, link))
-
-            # get the ornament details for this link
-            product_details = get_ornament_by_url(link)

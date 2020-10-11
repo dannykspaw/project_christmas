@@ -86,7 +86,7 @@ def get_ornament_by_url(link):
     name_element = driver.find_element_by_xpath('/html/body/div[3]/div[1]/div[2]/div/div[1]/section[2]/div/h1')
     price_element = driver.find_element_by_xpath('/html/body/div[3]/div[1]/div[2]/div/div[1]/section[2]/div/dl/dd[3]/div/span')
     availability_element = driver.find_element_by_xpath('/html/body/div[3]/div[1]/div[2]/div/div[1]/section[2]/div/dl/dd[6]')
-    id_element = driver.find_element_by_xpath('/html/body/div[3]/div[1]/div[2]/div/div[1]/section[3]/div[1]/form[1]/input[2]')
+    # id_element = driver.find_element_by_xpath('/html/body/div[3]/div[1]/div[2]/div/div[1]/section[3]/div[1]/form[1]/input[2]')
 
     # make sure that there is a column for everything in the schema
     ornament_details = dict.fromkeys(COLUMNS, None)
@@ -95,28 +95,9 @@ def get_ornament_by_url(link):
     ornament_details["price"] = price_element.text
     ornament_details["brand"] = brand_element.text
     ornament_details["availability"] = availability_element.text
-    ornament_details["vendor_id"] = id_element.get_attribute('value')
+    # ornament_details["vendor_id"] = id_element.get_attribute('value')
     ornament_details["vendor"] = integration_name
     ornament_details["link"] = link
 
     ornament_df = pd.DataFrame(ornament_details, index=[0])
     return ornament_df
-
-
-if __name__ == "__main__":
-    # todo: cache the year links between starts
-    for year, url in year_links.items():
-        print('getting product links for year {} link {}'.format(year, url))
-
-        # get all the product links for this year
-        product_links = {}
-        __get_ornament_links_by_year(url, product_links)
-
-        i = 0
-        count = len(product_links)
-        for product, link in product_links.items():
-            i += 1
-            print('{}/{} {} - getting details for {} at link {}'.format(i, count, year, product, link))
-
-            # get the ornament details for this link
-            product_details = get_ornament_by_url(link)

@@ -8,23 +8,21 @@ INSERT INTO
         brand,
         availability,
         release_year,
-        vendor_id,
         link,
         last_synced_at,
         created_at
     )
 VALUES
     (
-        MISSING,
-        'hookedonhallmark_com',
-        'XHD785',
-        '1973 Angel',
-        '$29.95', CONVERT TO FLOAT
-        'hallmark',
-        'Out of Stock',
+        '69f31a70-0b52-11eb-ac15-acde48001122',
+        'hallmark_ornaments_com',
+        'XHD1002',
+        '1973 Betsey Clark',
+        '59.95',
+        'Hallmark',
+        'Not In Stock',
         '1973',
-        '9',
-        'https://www.hookedonhallmark.com/1973-Angel_p_9.html',
-        MISSING,
-        MISSING
+        'https://www.hallmarkornaments.com/product.asp?lt_c=1&itemid=15761&qv=1&',
+        '2020-10-10 23:43:35.769627',
+        '2020-10-10 23:43:35.769634'
     )

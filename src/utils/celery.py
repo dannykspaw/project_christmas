@@ -1,3 +1,4 @@
+from functools import wraps
 from celery import Celery
 from datetime import timedelta
 
@@ -13,6 +14,18 @@ def tasks_formatter(schedule):
     return schedule
 
 
+def hooks(func):
+    '''adds support for pre/post operations on function decorated with this decorator'''
+    # todo: get pre/post handlers by dot-notation
+    #       module name and run accordingly
+    @wraps(func)
+    def hooks(*args, **kwargs):
+        print('pre-hook for decorated function')
+        func(*args, **kwargs)
+
+    return hooks
+
+
 def __dict_to_timedelta(schedule_dict):
     '''takes a dictionary are returns a timedelta instance'''
     if type(schedule_dict) == type(timedelta):
@@ -24,3 +37,4 @@ def __dict_to_timedelta(schedule_dict):
 redis = config.redis
 app = Celery('ornaments', broker='redis://{}:{}/'.format(redis.host, redis.port))
 app.conf.timezone = config.scheduler.timezone
+app.async_task = hooks
