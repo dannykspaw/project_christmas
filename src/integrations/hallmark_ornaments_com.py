@@ -61,6 +61,7 @@ def get_ornament_by_url(link):
 
 def get_ornaments_by_year(year):
     ornaments_df = pd.DataFrame(columns=COLUMNS)
+    num_of_products = 0
     try:
         year = str(year)
         driver.get(year_links[str(year)])
@@ -68,10 +69,10 @@ def get_ornaments_by_year(year):
         num_of_products = quantity.text[26:]
         quick_view_links = []
     except Exception as e:
-        year = int(year)
         print(str(e))
-        year += 1
+        year = int(year)
     #create quick view links within year
+    quick_view_links = []
     for x in range(1,int(num_of_products)+1):
         try:
             ornament = driver.find_element_by_xpath('//*[@id="productCategoryBlock"]/div[4]/div/div/div[{}]'.format(str(x)))

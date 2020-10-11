@@ -112,5 +112,5 @@ def get_integration_by_name(key=None):
     return __import__('integrations.{}'.format(key), fromlist=[integrations])
 
 
-# if __name__ == "__main__":
-#     sync_integration_by_year("hallmark_ornaments_com", 1976)
+if __name__ == "__main__":
+    sync_integration_by_year("hallmark_ornaments_com", 1974)
