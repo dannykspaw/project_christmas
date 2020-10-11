@@ -84,7 +84,11 @@ def sync_by_vendor(vendor=None, year=None):
     # get all years this integration supports
     years = [str(year)] if year != None else integration.year_links.keys()
     for year in years:
-        sync_integration_by_year(vendor, year)
+        try:
+            sync_integration_by_year(vendor, year)
+        except:
+            err = sys.exc_info()[0]
+            print('unable to sync integration {} by year {} err {}'.format(vendor, year, err))
 
 
 def sync_all():
