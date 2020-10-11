@@ -16,7 +16,7 @@ def sync_by_id(id=None):
 
     # 1. get the product in the database with this id
     product = products.get(id, ['id', 'vendor', 'price', 'availability'])
-
+    
     # 2. get the integration that the product is associated with (get_integration_by_name)
     # integration_name = 'hallmark_ornaments_com'
     integration_name = product.vendor 
@@ -28,7 +28,7 @@ def sync_by_id(id=None):
     synced_product = integration.sync_by_url(product.link)
 
     query_object = {
-        'id': product.id,
+        'id': product.id
     }
 
     update_object = {
@@ -54,13 +54,8 @@ def sync_integration_by_year(integration_name, year):
         raise Exception('unable to sync integration {} by year {} err integration does not support the provided year'.format(integration_name, year))
 
     print('syncing integration {} by year {}'.format(integration_name, year))
-    n_products = None
-
-    try:
-        n_products = integration.get_ornaments_by_year(str(year))
-    except Exception as err:
-        print('unable to sync integration {} by year {} err {}'.format(integration_name, year, err))
-
+    
+    n_products = integration.get_ornaments_by_year(str(year))
     if n_products is None:
         raise Exception('unable to sync integration {} by year {} err no products were returned from integration'.format(integration_name, year))
 
@@ -113,3 +108,4 @@ def get_integration_by_name(key=None):
 
 if __name__ == "__main__":
     sync_integration_by_year("hallmark_ornaments_com", 1976)
+    sync_by_id('')
