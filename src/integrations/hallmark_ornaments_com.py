@@ -67,7 +67,7 @@ def get_ornaments_by_year(year):
         driver.get(year_links[str(year)])
         quantity = driver.find_element_by_class_name('product-count')
         num_of_products = quantity.text[26:]
-        quick_view_links = []
+        print(num_of_products)
     except Exception as e:
         print(str(e))
         year = int(year)

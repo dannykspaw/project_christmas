@@ -27,7 +27,7 @@ tasks =  {
     #         'seconds': 30,
     #     },
     #     'kwargs': {
-    #         'year': '1973'
+    #         'year': '1974'
     #     }
     # },
     'sync-all-products': {
@@ -36,7 +36,7 @@ tasks =  {
         # how often should this task be executed?
         'schedule': {
             # milliseconds, seconds, minutes, hours, days, weeks
-            'seconds': 30,
+            'minutes': 10,
         }
     }
 }
