@@ -17,6 +17,19 @@ tasks =  {
             'year': '1973'
         }
     },
+    'sync-all-integrations-by-year': {
+        # the function that will execute this task
+        'task': 'integrator.sync_by_year',
+        # how often should this task be executed?
+        'schedule': {
+            # milliseconds, seconds, minutes, hours, days, weeks
+            'minutes': 1,
+            'seconds': 30,
+        },
+        'kwargs': {
+            'year': '1973'
+        }
+    }
 }
 
 timedelta_schedule = tasks_formatter(tasks)
