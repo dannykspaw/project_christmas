@@ -64,8 +64,10 @@ def create(new_product_df):
 
     values_delimited = ','.join(values)
     columns_delimited = ','.join(columns)
-    
-    pg.execute('INSERT INTO products ({}) VALUES {}'.format(columns_delimited, values_delimited))
+    insert_statement = 'INSERT INTO products ({}) VALUES {}'.format(columns_delimited, values_delimited)
+    print(insert_statement)
+
+    pg.execute(insert_statement)
     connect.commit()
 
 

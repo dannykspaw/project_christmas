@@ -72,5 +72,5 @@ CREATE TABLE IF NOT EXISTS products (
 
 #### setup
 - navigate to `./src/` folder
-- start celery worker `celery -A integrator worker --loglevel=INFO`
 - start celery scheduler `celery -A scheduler beat`
+- start celery worker `celery -A integrator worker --loglevel=INFO`

@@ -41,6 +41,7 @@ def sync_by_id(id=None):
     products.update(query_object, update_object)
 
 
+@app.task
 def sync_integration_by_year(integration_name, year):
     integration = get_integration_by_name(integration_name)
 
@@ -66,16 +67,17 @@ def sync_integration_by_year(integration_name, year):
     products.create(n_products)
 
 
+@app.task
 def sync_by_year(year=None):
     '''takes a year and syncs all integrations by year'''
     for integration in integrations_list:
         try:
             sync_integration_by_year(integration, year)
-        except:
-            err = sys.exc_info()[0]
+        except Exception as err:
             print('unable to sync integration {} by year {} err {}'.format(integration, year, err))
 
 
+@app.task
 def sync_by_vendor(vendor=None, year=None):
     '''takes a vendor and attempts to create a fully qualified product'''
     # get the integration module
@@ -86,8 +88,7 @@ def sync_by_vendor(vendor=None, year=None):
     for year in years:
         try:
             sync_integration_by_year(vendor, year)
-        except:
-            err = sys.exc_info()[0]
+        except Exception as err:
             print('unable to sync integration {} by year {} err {}'.format(vendor, year, err))
 
 
@@ -110,6 +111,5 @@ def get_integration_by_name(key=None):
     return __import__('integrations.{}'.format(key), fromlist=[integrations])
 
 
-if __name__ == "__main__":
-    sync_integration_by_year("hallmark_ornaments_com", 1976)
-    sync_by_id('')
+# if __name__ == "__main__":
+#     sync_integration_by_year("hallmark_ornaments_com", 1976)
