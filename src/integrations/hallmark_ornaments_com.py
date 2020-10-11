@@ -68,6 +68,7 @@ def get_ornaments_by_year(year):
         num_of_products = quantity.text[26:]
         quick_view_links = []
     except Exception as e:
+        year = int(year)
         print(str(e))
         year += 1
     #create quick view links within year
@@ -79,8 +80,8 @@ def get_ornaments_by_year(year):
             content = driver.find_element_by_xpath('//*[@id="productCategoryBlock"]/div[4]/div/div/div[{}]/div/div[1]/div/a'.format(x))
             quick_view_link = content.get_attribute('href')
             quick_view_links.append(quick_view_link)
-        except:
-            print("nada")
+        except Exception as e:
+            print(str(e))
     #pull product data from quick view link
     for link in quick_view_links:
         #run function for single link and return single link df

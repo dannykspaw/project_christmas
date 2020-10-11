@@ -92,6 +92,7 @@ def sync_by_vendor(vendor=None, year=None):
             print('unable to sync integration {} by year {} err {}'.format(vendor, year, err))
 
 
+@app.task
 def sync_all():
     '''sync all integrations'''
     for integration in integrations_list:
