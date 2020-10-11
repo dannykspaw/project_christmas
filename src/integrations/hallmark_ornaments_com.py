@@ -29,6 +29,9 @@ for year in year_content_block[0:48]:
     year_num = re.findall(r'\d+', year_link)[0]
     year_links[year_num] = year_link+'?viewall=1'
 
+# takeout
+print(year_links)
+
 def get_ornament_by_url(link):
     single_product_df = pd.DataFrame(columns=COLUMNS)
     driver.get(link)
@@ -62,13 +65,14 @@ def get_ornament_by_url(link):
 def get_ornaments_by_year(year):
     ornaments_df = pd.DataFrame(columns=COLUMNS)
     try:
+        year = str(year)
         driver.get(year_links[str(year)])
         quantity = driver.find_element_by_class_name('product-count')
         num_of_products = quantity.text[26:]
         print(year)
         quick_view_links = []
     except Exception as e:
-        print(e)
+        print(str(e))
         year += 1
     #create quick view links within year
     for x in range(1,int(num_of_products)+1):
@@ -88,5 +92,6 @@ def get_ornaments_by_year(year):
         single_product_df['release_year'] = year
         ornaments_df = ornaments_df.append(single_product_df,ignore_index=True,sort=True)
     return ornaments_df
+    print(ornaments_df.head(10))
 
 #get number of products

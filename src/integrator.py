@@ -112,4 +112,8 @@ def get_integration_by_name(key=None):
 
 
 if __name__ == "__main__":
+<<<<<<< Updated upstream
     sync_integration_by_year('hallmark_ornaments_com', 1974)
+=======
+    sync_by_vendor('hallmark_ornaments_com', 1974)
+>>>>>>> Stashed changes
