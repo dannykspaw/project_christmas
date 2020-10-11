@@ -62,11 +62,13 @@ def create(new_product_df):
         value = __dict_to_values(formatted_object)
         values.append(value)
 
+    if len(values) == 0:
+        print('unable to create new products because length is 0')
+        return
+
     values_delimited = ','.join(values)
     columns_delimited = ','.join(columns)
     insert_statement = 'INSERT INTO products ({}) VALUES {}'.format(columns_delimited, values_delimited)
-    print(insert_statement)
-
     pg.execute(insert_statement)
     connect.commit()
 
