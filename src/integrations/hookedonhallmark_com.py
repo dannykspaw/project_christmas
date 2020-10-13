@@ -68,8 +68,8 @@ def __get_ornament_links_by_year(url, links={}):
         a = name_block.find_element_by_tag_name('a')
         ornament_link = a.get_attribute("href")
 
-        if ornament_name in links.keys():
-            print('duplicate ornament name found: {}'.format(ornament_name))
+        # if ornament_name in links.keys():
+            # print('duplicate ornament name found: {}'.format(ornament_name))
 
         links[ornament_name] = ornament_link
 
@@ -91,22 +91,21 @@ def __get_ornament_links_by_year(url, links={}):
     except Exception as err:
         print('no next page found from url: {} err {}'.format(url, err))
 
+    return links
+
 
 def get_ornaments_by_year(year):
     year = str(year)
     year_link = year_links[year]
     products = __get_ornament_links_by_year(year_link)
-    ornaments_df = pd.DataFrame(columns=COLUMNS)
-
-    for link in products.values():
-        ornament_df = get_ornament_by_url(link)
-        ornament_df['release_year'] = year
-        ornaments_df = ornaments_df.append(ornament_df, ignore_index=True)
-
-    return ornaments_df
+    return products
 
 
-def get_ornament_by_url(link):
+def sync_by_url(url):
+    return __get_ornament_by_url(url)
+
+
+def __get_ornament_by_url(link):
     # navigate to the ornament details page
     driver.get(link)
 
@@ -128,6 +127,4 @@ def get_ornament_by_url(link):
     # ornament_details["Product Id"] = id_element.get_attribute('value')
     ornament_details["vendor"] = integration_name
     ornament_details["link"] = link
-    
-    ornament_df = pd.DataFrame(ornament_details, index=[0])
-    return ornament_df
+    return ornament_details

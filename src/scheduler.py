@@ -30,13 +30,17 @@ tasks =  {
     #         'year': '1973'
     #     }
     # },
-    'sync-all-products': {
+    'sync-yearly': {
         # the function that will execute this task
-        'task': 'integrator.sync_all',
+        'task': 'integrator.sync_by_year',
         # how often should this task be executed?
         'schedule': {
             # milliseconds, seconds, minutes, hours, days, weeks
             'seconds': 30,
+        },
+        'kwargs': {
+            # 'integration_name': 'ornament_shop_com',
+            'year': '1977'
         }
     }
 }

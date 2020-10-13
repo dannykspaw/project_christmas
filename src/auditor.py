@@ -12,6 +12,10 @@ product property history    - ornaments:ID:PROPERTY:history         ordered set 
 
 '''
 
+def audit():
+    pass
+
+
 listeners = {
     # name of the task for audit purposes
     'audit-product-price-history': {

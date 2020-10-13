@@ -11,6 +11,7 @@ import integrations
 pg = cursor
 integrations_list = [name for _, name, _ in pkgutil.iter_modules(['integrations'])]
 
+
 def sync_by_id(id=None):
     '''finds the product by id and calls the associated integration to update it using the product url'''
 
@@ -41,7 +42,36 @@ def sync_by_id(id=None):
     products.update(query_object, update_object)
 
 
-@app.task
+@app.async_task
+def sync_integration_by_url(integration_name=None, url=None):
+    # integration = integrations.hallmark_ornaments_com
+    integration = get_integration_by_name(integration_name)
+    synced_product = integration.sync_by_url(url)
+
+    # todo: handle when the integration doesn't return a value
+
+    find_query_object = {
+        'vendor': integration_name,
+        'link': url,
+        'sku': synced_product['sku']
+    }
+    product = products.find_one(find_query_object, ['id'])
+    if product is None:
+        return products.create(synced_product)
+
+    update_query = {
+        'id': product[0]
+    }
+    update_object = {
+        'price': synced_product['price'],
+        'availability': synced_product['availability'],
+        'last_synced_at': datetime.utcnow(),
+    }
+
+    products.update(update_query, update_object)
+
+
+@app.async_task
 def sync_integration_by_year(integration_name, year):
     integration = get_integration_by_name(integration_name)
 
@@ -56,28 +86,22 @@ def sync_integration_by_year(integration_name, year):
 
     print('syncing integration {} by year {}'.format(integration_name, year))
     
-    n_products = integration.get_ornaments_by_year(str(year))
-    if n_products is None:
+    links_dict = integration.get_ornaments_by_year(str(year))
+    if links_dict is None:
         raise Exception('unable to sync integration {} by year {} err no products were returned from integration'.format(integration_name, year))
 
-    print('found {} products syncing integration {} by year {}'.format(n_products.shape[0], integration_name, year))
-
-    # todo: handle duplicates -- lookup where (sku & vendor & year) to use unique index
-    # if duplicate, update by id
-    products.create(n_products)
+    print('found {} products syncing integration {} by year {}'.format(len(links_dict.keys()), integration_name, year))
+    for _, link in links_dict.items():
+        sync_integration_by_url(integration_name, link)
 
 
-@app.task
+@app.async_task
 def sync_by_year(year=None):
     '''takes a year and syncs all integrations by year'''
     for integration in integrations_list:
-        try:
-            sync_integration_by_year(integration, year)
-        except Exception as err:
-            print('unable to sync integration {} by year {} err {}'.format(integration, year, err))
+        sync_integration_by_year(integration, year)
 
 
-@app.task
 def sync_by_vendor(vendor=None, year=None):
     '''takes a vendor and attempts to create a fully qualified product'''
     # get the integration module
@@ -92,7 +116,6 @@ def sync_by_vendor(vendor=None, year=None):
             print('unable to sync integration {} by year {} err {}'.format(vendor, year, err))
 
 
-@app.task
 def sync_all():
     '''sync all integrations'''
     for integration in integrations_list:
@@ -110,7 +133,3 @@ def get_integration_by_name(key=None):
         raise Exception('integration {} is not supported'.format(key))
 
     return __import__('integrations.{}'.format(key), fromlist=[integrations])
-
-
-if __name__ == "__main__":
-    sync_integration_by_year("hallmark_ornaments_com", 1974)

@@ -12,6 +12,7 @@ connect = psycopg2.connect(
     user = pg.user,
     password = pg.password
 )
+connect.autocommit = True
 
 print(str(connect.closed).replace("0","Connected to {}...".format(pg.database)))
 cursor = connect.cursor()
@@ -22,4 +23,7 @@ if config.env == 'default':
 
 # create tables if they don't exist
 cursor.execute(open('{}/migrations/create-tables.sql'.format(path.curdir), 'r').read())
-connect.commit()
+
+
+def cleanup():
+    connect.close()
