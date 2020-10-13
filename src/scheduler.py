@@ -27,7 +27,7 @@ tasks =  {
     #         'seconds': 30,
     #     },
     #     'kwargs': {
-    #         'year': '1973'
+    #         'year': '1974'
     #     }
     # },
     'sync-yearly': {

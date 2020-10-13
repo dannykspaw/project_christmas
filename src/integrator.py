@@ -133,3 +133,8 @@ def get_integration_by_name(key=None):
         raise Exception('integration {} is not supported'.format(key))
 
     return __import__('integrations.{}'.format(key), fromlist=[integrations])
+
+
+# if __name__ == "__main__":
+#     for x in range(1973,1977):
+#         sync_integration_by_year("hallmark_ornaments_com", x)
