@@ -3,6 +3,4 @@
 # exposes an api
 # talks with the db to read entries
 
-from utils.postgres import connect
-
-postgres = connect()
+from utils.postgres import cursor

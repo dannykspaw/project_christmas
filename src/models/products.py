@@ -101,6 +101,19 @@ def create(new_product_dict):
 
 
 @app.hooks
+def update_one(id, update_object):
+    obj = __format(update_object)
+    set_query = ','.join(['{} = \'{}\''.format(k, v) for k, v in obj.items()])
+    update_statement = 'UPDATE products SET {} WHERE id = \'{}\''.format(set_query, id)
+
+    try:
+        pg.execute(update_statement)
+    except Exception as err:
+        print('unable to update product err {} sql {}'.format(err, update_statement))
+        return
+
+
+@app.hooks
 def update(query, update_object):
     obj = __format(update_object)
     set_query = ','.join(['{} = \'{}\''.format(k, v) for k, v in obj.items()])
@@ -111,6 +124,7 @@ def update(query, update_object):
         pg.execute(update_statement)
     except Exception as err:
         print('unable to update product err {} sql {}'.format(err, update_statement))
+        return
         
 
 def __format(new_object):

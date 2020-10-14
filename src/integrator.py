@@ -26,27 +26,31 @@ def sync_by_id(id=None):
     integration = get_integration_by_name(integration_name)
 
     # 3. use the integration to fetch the current product details
-    synced_product = integration.sync_by_url(product.link)
-
-    query_object = {
-        'id': product.id
-    }
+    synced_product = None
+    try:
+        synced_product = integration.sync_by_url(product.link)
+    except Exception as err:
+        print('unable to sync integration {} by id {} err {}'.format(integration_name, id, err))
+        return
 
     update_object = {
         'price': synced_product.price,
         'availability': synced_product.availability,
-        'last_synced_at': datetime.utcnow(),
     }
 
     # 4. update the database
-    products.update(query_object, update_object)
+    products.update_one(id, update_object)
 
 
 @app.async_task
 def sync_integration_by_url(integration_name=None, url=None):
-    # integration = integrations.hallmark_ornaments_com
     integration = get_integration_by_name(integration_name)
-    synced_product = integration.sync_by_url(url)
+
+    try:
+        synced_product = integration.sync_by_url(url)
+    except Exception as err:
+        print('unable to sync integration {} by url {} err {}'.format(integration_name, url, err))
+        return
 
     # todo: handle when the integration doesn't return a value
 
@@ -59,20 +63,19 @@ def sync_integration_by_url(integration_name=None, url=None):
     if product is None:
         return products.create(synced_product)
 
-    update_query = {
-        'id': product[0]
-    }
+    id = product[0]
     update_object = {
         'price': synced_product['price'],
         'availability': synced_product['availability'],
         'last_synced_at': datetime.utcnow(),
     }
 
-    products.update(update_query, update_object)
+    products.update_one(id, update_object)
 
 
 @app.async_task
 def sync_integration_by_year(integration_name, year):
+    links_dict = {}
     integration = get_integration_by_name(integration_name)
 
     if year is None:
@@ -102,6 +105,7 @@ def sync_by_year(year=None):
         sync_integration_by_year(integration, year)
 
 
+@app.async_task
 def sync_by_vendor(vendor=None, year=None):
     '''takes a vendor and attempts to create a fully qualified product'''
     # get the integration module
@@ -116,6 +120,7 @@ def sync_by_vendor(vendor=None, year=None):
             print('unable to sync integration {} by year {} err {}'.format(vendor, year, err))
 
 
+@app.task
 def sync_all():
     '''sync all integrations'''
     for integration in integrations_list:

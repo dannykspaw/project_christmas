@@ -11,23 +11,23 @@
 
 #### tasks
 - [ ] integrations
-    - [ ] integrations use models (models.products) for creating dataframes
     - [ ] refactor
         - [ ] year links cached (using utils.redis)
         - [x] selenium webdriver creation abstracted to utils.selenium file
-        - [ ] use global driver instance (utils.selenium.driver)
-        - [ ] global driver is created for each integration
-        - [ ] csv caching removed
+        - [x] use global driver instance (utils.selenium.driver)
+        - [x] global driver is created for each integration
+        - [x] csv caching removed
 - [ ] databases
     - [ ] redis
         - [x] utility module created
         - [ ] connection parameterized using environment variables
-- [ ] integrator
-    - [ ] can sync products from each integration
-    - [ ] can insert new products into database
-- [ ] scheduler
+- [x] integrator
+    - [x] can sync products from each integration
+    - [x] can insert new products into database
+- [x] scheduler
     - [x] celery configuration
-    - [ ] setup reccurring tasks
+    - [x] setup reccurring tasks
+    - [x] async task decorator created
 - [ ] auditor
     - [ ] postgres "change streams" pubsub setup
     - [ ] audit functionality
@@ -73,4 +73,4 @@ CREATE TABLE IF NOT EXISTS products (
 #### setup
 - navigate to `./src/` folder
 - start celery scheduler `celery -A scheduler beat`
-- start celery worker `celery -A integrator worker --loglevel=INFO`
+- start celery worker `celery -A integrator worker --loglevel=INFO --concurrency=1 -n worker1@%h`

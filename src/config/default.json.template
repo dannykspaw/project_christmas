@@ -1,5 +1,6 @@
 {
     "env": "default",
+    "wipe_db": false,
     "postgres": {
         "host": "localhost",
         "port": 5432,

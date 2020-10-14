@@ -55,7 +55,7 @@ def __get_ornament_links_by_year(url, links={}):
         next_page_block = driver.find_element_by_class_name('pagination-item--next')
         next_page_link = next_page_block.find_element_by_tag_name('a').get_attribute('href')
         
-        print('next page link found: {}'.format(next_page_link))
+        # print('next page link found: {}'.format(next_page_link))
         __get_ornament_links_by_year(next_page_link, links)
     except Exception as err:
         print('no next page found from url: {} err {}'.format(url, err))

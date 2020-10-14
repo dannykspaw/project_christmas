@@ -86,7 +86,7 @@ def __get_ornament_links_by_year(url, links={}):
         if next_page_link is None:
             return links
 
-        print('next page link found: {}'.format(next_page_link))
+        # print('next page link found: {}'.format(next_page_link))
         __get_ornament_links_by_year(next_page_link, links)
     except Exception as err:
         print('no next page found from url: {} err {}'.format(url, err))
