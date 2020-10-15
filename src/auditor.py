@@ -1,35 +1,19 @@
-from utils.events import bus
+from datetime import datetime
+
+from utils.celery import app
+from utils.redis import client
+from utils.config import config
 
 
-# tracks changes in the database and audits them
-# use a generated id for every model to avoid different product sku's being duplicates
+# ornaments:MODEL:ID:FIELD
+audit_history = 'ornaments:{}:{}:{}'
 
-'''
+@app.job
+def audit(id, args, **kwargs):
+    _, model, __ = kwargs['task_name'].split('.')
+    fields = set(args.keys()).union(set(config.hooks.audit[kwargs['audit_key']]))
+    for field in fields:
+        print('auditting field {} value {} on model {} id {}'.format(field, args[field], model, id))
 
-product base                - ornaments:ID                          24 character id
-product property base       - ornaments:ID:PROPERTY                 price (could be expanded to support other properties)
-product property history    - ornaments:ID:PROPERTY:history         ordered set (by timestamp) of changes to this property
-
-'''
-
-def audit():
-    pass
-
-
-listeners = {
-    # name of the task for audit purposes
-    'audit-product-price-history': {
-        # the function to listen to
-        'subscription': 'models.products.update',
-        # the function which handles the event
-        'handler': 'auditor.audit',
-        # the query to filter objects (only works on model functions)
-        # e.g. only auditing updates to price which happens to use a 
-        #       special flag that gets set for each field that was changed
-        'query': {
-            'price': '$changed'
-        }
-    }
-}
-
-bus.add_listeners(listeners)
+        # from timestamp to date datetime.datetime.utcfromtimestamp(TIMESTAMP)
+        client.zadd(audit_history.format(model, id, field), { args[field]: datetime.utcnow().timestamp() })

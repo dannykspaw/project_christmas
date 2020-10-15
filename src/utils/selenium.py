@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
+print('Creating selenium driver...')
 
 # setup driver for chrome instance
 chrome_options = Options()	

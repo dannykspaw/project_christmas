@@ -3,14 +3,11 @@ import pkgutil
 from datetime import datetime
 
 from utils.celery import app
-from utils.postgres import cursor, connect
 from models import products
 import integrations
 
 
-pg = cursor
 integrations_list = [name for _, name, _ in pkgutil.iter_modules(['integrations'])]
-
 
 def sync_by_id(id=None):
     '''finds the product by id and calls the associated integration to update it using the product url'''
@@ -19,10 +16,7 @@ def sync_by_id(id=None):
     product = products.get(id, ['id', 'vendor', 'price', 'availability'])
     
     # 2. get the integration that the product is associated with (get_integration_by_name)
-    # integration_name = 'hallmark_ornaments_com'
     integration_name = product.vendor 
-
-    # integration = integrations.hallmark_ornaments_com
     integration = get_integration_by_name(integration_name)
 
     # 3. use the integration to fetch the current product details
@@ -42,8 +36,8 @@ def sync_by_id(id=None):
     products.update_one(id, update_object)
 
 
-@app.async_task
-def sync_integration_by_url(integration_name=None, url=None):
+@app.job
+def sync_integration_by_url(integration_name=None, url=None, year=None):
     integration = get_integration_by_name(integration_name)
 
     try:
@@ -61,6 +55,7 @@ def sync_integration_by_url(integration_name=None, url=None):
     }
     product = products.find_one(find_query_object, ['id'])
     if product is None:
+        synced_product['release_year'] = year
         return products.create(synced_product)
 
     id = product[0]
@@ -73,7 +68,7 @@ def sync_integration_by_url(integration_name=None, url=None):
     products.update_one(id, update_object)
 
 
-@app.async_task
+@app.job
 def sync_integration_by_year(integration_name, year):
     links_dict = {}
     integration = get_integration_by_name(integration_name)
@@ -95,17 +90,17 @@ def sync_integration_by_year(integration_name, year):
 
     print('found {} products syncing integration {} by year {}'.format(len(links_dict.keys()), integration_name, year))
     for _, link in links_dict.items():
-        sync_integration_by_url(integration_name, link)
+        sync_integration_by_url(integration_name, link, year)
 
 
-@app.async_task
+@app.job
 def sync_by_year(year=None):
     '''takes a year and syncs all integrations by year'''
     for integration in integrations_list:
         sync_integration_by_year(integration, year)
 
 
-@app.async_task
+@app.job
 def sync_by_vendor(vendor=None, year=None):
     '''takes a vendor and attempts to create a fully qualified product'''
     # get the integration module
@@ -140,6 +135,6 @@ def get_integration_by_name(key=None):
     return __import__('integrations.{}'.format(key), fromlist=[integrations])
 
 
-# if __name__ == "__main__":
-#     for x in range(1973,1977):
-#         sync_integration_by_year("hallmark_ornaments_com", x)
+if __name__ == "__main__":
+    # sync_by_vendor("hallmark_ornaments_com")
+    products.update_one('46597828-0e60-11eb-8a23-acde48001122', { 'price': 150 })

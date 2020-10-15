@@ -29,10 +29,8 @@
     - [x] setup reccurring tasks
     - [x] async task decorator created
 - [ ] auditor
-    - [ ] postgres "change streams" pubsub setup
-    - [ ] audit functionality
-        - [ ] price history is tracked over time
-        - [ ] config to toggle more fields on
+    - [ ] price history is tracked over time
+    - [ ] config to toggle more fields on
 - [ ] server
     - [ ] routes
         - [ ] what are they?

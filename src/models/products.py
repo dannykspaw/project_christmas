@@ -38,12 +38,14 @@ columns = [
 ]
 
 
+@app.hooks
 def get(id, projection):
     select_statement = 'SELECT {} FROM products WHERE id = {};'.format(','.join(projection), id)
     pg.execute(select_statement)
     return pg.fetchone()
 
 
+@app.hooks
 def find(query, projection):
     select_query = ','.join(projection)
     where_query = ' and '.join(['{} = \'{}\''.format(k, v) for k, v in query.items()])
@@ -58,6 +60,7 @@ def find(query, projection):
     return results
 
 
+@app.hooks
 def find_one(query, projection):
     result = find(query, projection)
     if type(result) == list:
@@ -107,6 +110,7 @@ def update_one(id, update_object):
     update_statement = 'UPDATE products SET {} WHERE id = \'{}\''.format(set_query, id)
 
     try:
+        print('updating product id {}'.format(id))
         pg.execute(update_statement)
     except Exception as err:
         print('unable to update product err {} sql {}'.format(err, update_statement))
@@ -130,7 +134,7 @@ def update(query, update_object):
 def __format(new_object):
     try:
         new_object['last_synced_at'] = datetime.utcnow()
-        new_object['price'] = Decimal(sub(r'[^\d.]', '', new_object['price']))
+        new_object['price'] = Decimal(sub(r'[^\d.]', '', str(new_object['price'])))
     except Exception as err:
         print('there was a problem while formatting product err {}'.format(err))
     return new_object
@@ -138,10 +142,15 @@ def __format(new_object):
 
 def __dict_to_values(dict):
     '''converts a dictionary and converts it's values into the values portion of an sql insert statement'''
-    values = [None] * len(columns)
-    for i in range(len(values)):
-        values[i] = str(dict[columns[i]]).replace('\'', '\'\'')
+    try:
+        values = [None] * len(columns)
+        for i in range(len(values)):
+            values[i] = str(dict[columns[i]]).replace('\'', '\'\'')
 
-    # https://repl.it/@terranblake/DeeppinkWeepyComputing#main.py
-    result =  '(' + ','.join(['\'{}\''.format(x) for x in values]) + ')'
+        # https://repl.it/@terranblake/DeeppinkWeepyComputing#main.py
+        result =  '(' + ','.join(['\'{}\''.format(x) for x in values]) + ')'
+    except Exception as err:
+        print('unable to convert dict {} to values err {}'.format(dict, err))
+        return
+
     return result
