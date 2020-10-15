@@ -7,7 +7,7 @@
 
 #### architecture
 
-![architecture](./images/architecture.png?raw=true "High-Level Architecture")
+![architecture](./images/process-flow.png?raw=true "High-Level Architecture")
 
 #### tasks
 - [ ] celery
