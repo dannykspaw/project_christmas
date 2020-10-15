@@ -38,10 +38,6 @@ def get_year_links():
     return year_links
 
 
-# todo: cache the year links between starts
-year_links = get_year_links()
-
-
 def __get_ornament_links_by_year(url, links={}):
     driver.get(url)
     ornament_blocks = driver.find_elements_by_class_name("product-item")
@@ -94,10 +90,12 @@ def __get_ornament_links_by_year(url, links={}):
     return links
 
 
-def get_ornaments_by_year(year):
+def get_ornaments_by_year(year, link):
+    if link == None:
+        raise Exception('unable to sync integration {} by year {} because link was not provided'.format(integration_name, year))
+
     year = str(year)
-    year_link = year_links[year]
-    products = __get_ornament_links_by_year(year_link)
+    products = __get_ornament_links_by_year(link)
     return products
 
 

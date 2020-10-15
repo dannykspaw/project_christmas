@@ -1,11 +1,12 @@
+from os import path
 import uuid
 from re import sub
 from decimal import Decimal
 from datetime import datetime
-from pandas import DataFrame
 
-from utils.postgres import cursor, connect
+from utils.postgres import cursor, columns
 from utils.celery import app
+from utils.config import config
 
 
 # todo: object to sql converter
@@ -23,34 +24,24 @@ from utils.celery import app
 #       well as the functions to modify them
 
 pg = cursor
-columns = [
-    'id',
-    'vendor',
-    'sku',
-    'name',
-    'price',
-    'brand',
-    'availability',
-    'release_year',
-    'link',
-    'last_synced_at',
-    'created_at'
-]
+model = path.basename(__file__).replace('.py', '')
+columns = columns(model)
 
 
 @app.hooks
-def get(id, projection):
-    select_statement = 'SELECT {} FROM products WHERE id = {};'.format(','.join(projection), id)
+def get_by_id(id, projection):
+    formatted_projection = ','.join(projection)
+    select_statement = 'SELECT {} FROM {} WHERE id = {};'.format(formatted_projection, model, id)
     pg.execute(select_statement)
     return pg.fetchone()
 
 
 @app.hooks
-def find(query, projection):
+def find(query, projection, limit=config.resources.limit):
     select_query = ','.join(projection)
     where_query = ' and '.join(['{} = \'{}\''.format(k, v) for k, v in query.items()])
-    # limit_query = 'LIMIT {}'.format(limit) if limit else ''
-    query = 'SELECT {} FROM products WHERE {}'.format(select_query, where_query)
+    limit_query = ' LIMIT {}'.format(str(limit)) if limit else ''
+    query = 'SELECT {} FROM {} WHERE {}{}'.format(select_query, model, where_query, limit_query)
     pg.execute(query)
 
     results = pg.fetchall()

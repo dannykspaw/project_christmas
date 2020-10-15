@@ -3,6 +3,7 @@ import pkgutil
 from datetime import datetime
 
 from utils.celery import app
+from utils.redis import store
 from models import products
 import integrations
 
@@ -13,7 +14,7 @@ def sync_by_id(id=None):
     '''finds the product by id and calls the associated integration to update it using the product url'''
 
     # 1. get the product in the database with this id
-    product = products.get(id, ['id', 'vendor', 'price', 'availability'])
+    product = products.get_by_id(id, ['id', 'vendor', 'price', 'availability'])
     
     # 2. get the integration that the product is associated with (get_integration_by_name)
     integration_name = product.vendor 
@@ -76,15 +77,15 @@ def sync_integration_by_year(integration_name, year):
     if year is None:
         raise Exception('unable to sync integration {} for year {} err please provide a year to sync'.format(integration_name, year))
 
+    cache_key = 'cache:integration:{}:links:year:{}'.format(integration_name, year)
     year = str(year)
-    years = [str(x) for x in integration.year_links.keys()]
+    # todo: abstract this behind an integration hook
+    year_link = store.get(cache_key)
+    if year_link == None:
+        raise Exception('unable to sync integration {} for year {} err no year link found'.format(integration_name, year))
 
-    if year not in years:
-        raise Exception('unable to sync integration {} by year {} err integration does not support the provided year'.format(integration_name, year))
-
-    print('syncing integration {} by year {}'.format(integration_name, year))
-    
-    links_dict = integration.get_ornaments_by_year(str(year))
+    print('syncing integration {} by year {} link {}'.format(integration_name, year, year_link))
+    links_dict = integration.get_ornaments_by_year(year, year_link)
     if links_dict is None:
         raise Exception('unable to sync integration {} by year {} err no products were returned from integration'.format(integration_name, year))
 
@@ -97,22 +98,33 @@ def sync_integration_by_year(integration_name, year):
 def sync_by_year(year=None):
     '''takes a year and syncs all integrations by year'''
     for integration in integrations_list:
-        sync_integration_by_year(integration, year)
+        sync_integration_by_year(integration, str(year))
 
 
 @app.job
-def sync_by_vendor(vendor=None, year=None):
-    '''takes a vendor and attempts to create a fully qualified product'''
-    # get the integration module
-    integration = get_integration_by_name(vendor)
+def sync_by_integration(integration_name=None):
+    '''takes a integration_name and attempts to create a fully qualified product'''
 
-    # get all years this integration supports
-    years = [str(year)] if year != None else integration.year_links.keys()
-    for year in years:
+    integration = get_integration_by_name(integration_name)
+    links_dict = integration.get_year_links()
+
+    integration_links_key = 'cache:integration:{}:links:years'.format(integration_name)
+    one_week = 60 * 60 * (24 * 7)
+    print('eval', eval('60 * 60 * (24 * 7)'))
+
+    # get the integration module
+    # todo: abstract this behind an integration hook
+    for year, link in links_dict.items():
+        integration_link_cache_key = 'cache:integration:{}:links:year:{}'.format(integration_name, year)
+        # refresh year links weekly
+        store.set_to_expire(integration_link_cache_key, link, one_week)
+        store.sadd(integration_links_key, year)
+        store.expire(integration_links_key, one_week)
+
         try:
-            sync_integration_by_year(vendor, year)
+            sync_integration_by_year(integration_name, year)
         except Exception as err:
-            print('unable to sync integration {} by year {} err {}'.format(vendor, year, err))
+            print('unable to sync integration {} by year {} err {}'.format(integration_name, year, err))
 
 
 @app.task
@@ -135,6 +147,6 @@ def get_integration_by_name(key=None):
     return __import__('integrations.{}'.format(key), fromlist=[integrations])
 
 
-if __name__ == "__main__":
-    sync_by_vendor("hallmark_ornaments_com")
-    # products.update_one('46597828-0e60-11eb-8a23-acde48001122', { 'price': 150 })
+# if __name__ == "__main__":
+    # sync_by_integration("hallmark_ornaments_com")
+    # products.update_one('46597828-0e60-11eb-8a23-acde48001122', { 'price': 250 })

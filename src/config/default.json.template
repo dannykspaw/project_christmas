@@ -22,7 +22,7 @@
         "priority": {
             "integrator.sync_integration_by_year": 3,
             "integrator.sync_integration_by_url": 0,
-            "integrator.sync_by_vendor": 3,
+            "integrator.sync_by_integration": 3,
             "auditor.audit": 5
         },
         "auth": {
@@ -30,7 +30,7 @@
             "auditor.*": false
         },
         "roles": {
-            "models.products.get": ["user"],
+            "models.products.get_by_id": ["user"],
             "models.products.find": ["user"],
             "models.products.update": ["integrator"],
             "models.products.create": ["integrator"]

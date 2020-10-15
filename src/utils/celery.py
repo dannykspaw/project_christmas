@@ -1,28 +1,32 @@
 import os
+import sys
 import inspect
 from functools import wraps
 from celery import Celery, signals
 from datetime import timedelta
 import re
 
-from .redis import client
 from .config import config
 
 from pprint import pprint
 
 
 @signals.worker_shutting_down.connect
-def shutdown(**kwargs):
+def close(**kwargs):
     print('terminating celery session...')
     app.close()
-
-    print('terminating webdriver executable...')
-    from .selenium import driver
-    driver.quit()
 
     print('terminating postgres connection...')
     from .postgres import connect
     connect.close()
+
+    print('terminating redis connection...')
+    from .redis import store
+    store.close()
+
+    print('terminating webdriver executable...')
+    from .selenium import driver
+    driver.quit()
 
 
 @signals.task_prerun.connect
@@ -36,7 +40,7 @@ def posthook(task_id=None, task=None, **kwargs):
     # todo: abstract pre-post hooks behind module or simplify to array of functions to run before and after
     if len(config.hooks.audit.keys()) != 0:
         for pattern in config.hooks.audit.keys():
-            print('checking if task {} matches audit pattern {}'.format(task.name, pattern))
+            # print('checking if task {} matches audit pattern {}'.format(task.name, pattern))
             if re.match(pattern, task.name) != None:
                 priority = config.hooks.priority['auditor.audit']
                 app.send_task('auditor.audit', args=kwargs['args'], kwargs=kwargs, priority=priority)
@@ -74,7 +78,6 @@ def job(func):
         except Exception as err:
             print('unable to send async_task {} err {}'.format(task_name, err))
 
-    print(func.__module__, func.__name__)
     app.task(func)
     return __hooks
 
@@ -110,7 +113,6 @@ def hooks(func):
     # location of the caller
 
     task_name = __function_to_task_name(func, task_location)
-    print('hooks', task_name)
     app.task(func, name=task_name)
     return __task
 
@@ -126,9 +128,15 @@ def __dict_to_timedelta(schedule_dict):
 
     return timedelta(**schedule_dict)
 
+base = 'celery'
+# if 'celery' in sys.argv[0]:
+#     base = sys.argv[2]
+# else:
+#     base = sys.argv[0].replace('.py', '').replace('./', '')
 
+print('Connecting to celery using base {}'.format(base))
 redis = config.redis
-app = Celery('ornaments', broker='redis://{}:{}/'.format(redis.host, redis.port))
+app = Celery(base, broker='redis://{}:{}/'.format(redis.host, redis.port),)
 app.conf.timezone = config.scheduler.timezone
 app.hooks = hooks
 app.job = job

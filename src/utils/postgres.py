@@ -2,6 +2,7 @@ from os import path
 import psycopg2
 from .config import config
 
+
 print('Connecting to postgres...')
 
 # connect to the db
@@ -25,5 +26,9 @@ cursor = connect.cursor()
 cursor.execute(open('{}/migrations/create-tables.sql'.format(path.curdir), 'r').read())
 
 
-def cleanup():
-    connect.close()
+def columns(table_name):
+    cursor.execute('select column_name from information_schema.columns where table_name = \'{}\';'.format(table_name))
+    results = cursor.fetchall()
+    if results != None:
+        results = [x[0] for x in results]
+    return results

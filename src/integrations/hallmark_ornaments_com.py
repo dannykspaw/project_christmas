@@ -16,19 +16,15 @@ COLUMNS = products.columns
 
 action = ActionChains(driver)
 
-# go to website
-driver.get(
-    "https://www.hallmarkornaments.com/Hallmark-Ornaments-By-Year_c_200.html")
-
-# pull years
-year_content_block = driver.find_elements_by_class_name("subcat")
-
-year_links = {}
-
-for year in year_content_block[0:48]:
-    year_link = year.get_attribute("href")
-    year_num = re.findall(r'\d+', year_link)[0]
-    year_links[year_num] = year_link+'?viewall=1'
+def get_year_links():
+    driver.get("https://www.hallmarkornaments.com/Hallmark-Ornaments-By-Year_c_200.html")
+    year_content_block = driver.find_elements_by_class_name("subcat")
+    year_links = {}
+    for year in year_content_block[0:48]:
+        year_link = year.get_attribute("href")
+        year_num = re.findall(r'\d+', year_link)[0]
+        year_links[year_num] = year_link+'?viewall=1'
+    return year_links
 
 
 def __get_ornament_by_url(link):
@@ -72,15 +68,18 @@ def sync_by_url(url):
     return __get_ornament_by_url(url)
 
 
-def get_ornaments_by_year(year):
+def get_ornaments_by_year(year, link):
+    if link == None:
+        raise Exception('unable to sync integration {} by year {} because link was not provided'.format(integration_name, year))
+
     num_of_products = 0
     try:
         year = str(year)
-        driver.get(year_links[str(year)])
+        driver.get(link)
         quantity = driver.find_element_by_class_name('product-count')
         num_of_products = quantity.text[26:]
     except Exception as err:
-        print('unable to get number of ornaments in hallmark_ornaments_com for year {} url {} err {}'.format(year, year_links[str(year)], err))
+        print('unable to get number of ornaments in hallmark_ornaments_com for year {} url {} err {}'.format(year, link, err))
         year = int(year)
     # create quick view links within year
     quick_view_links = {}
