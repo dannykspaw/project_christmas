@@ -136,5 +136,5 @@ def get_integration_by_name(key=None):
 
 
 if __name__ == "__main__":
-    # sync_by_vendor("hallmark_ornaments_com")
-    products.update_one('46597828-0e60-11eb-8a23-acde48001122', { 'price': 150 })
+    sync_by_vendor("hallmark_ornaments_com")
+    # products.update_one('46597828-0e60-11eb-8a23-acde48001122', { 'price': 150 })

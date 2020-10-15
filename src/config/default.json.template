@@ -15,5 +15,28 @@
     },
     "scheduler": {
         "timezone": "UTC"
+    },
+    "auditor": {        
+    },
+    "hooks": {
+        "priority": {
+            "integrator.sync_integration_by_year": 3,
+            "integrator.sync_integration_by_url": 0,
+            "integrator.sync_by_vendor": 3,
+            "auditor.audit": 5
+        },
+        "auth": {
+            "integrator.*": false,
+            "auditor.*": false
+        },
+        "roles": {
+            "models.products.get": ["user"],
+            "models.products.find": ["user"],
+            "models.products.update": ["integrator"],
+            "models.products.create": ["integrator"]
+        },
+        "audit": {
+            "models.products.*": ["price", "last_synced_at"]
+        }
     }
 }
