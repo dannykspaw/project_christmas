@@ -2,7 +2,6 @@ import base64
 import pickle
 import json
 import redis
-from pprint import pprint
 
 from .config import config
 
@@ -23,6 +22,10 @@ class Store(object):
     def get(self, key):
         value = self.client.get(key)
         return value
+
+    
+    def set(self, key, value):
+        self.client.set(key, value)
 
 
     def set_to_expire(self, key, value, ttl):

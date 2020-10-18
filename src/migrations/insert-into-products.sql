@@ -14,15 +14,15 @@ INSERT INTO
     )
 VALUES
     (
-        '69f31a70-0b52-11eb-ac15-acde48001122',
-        'hallmark_ornaments_com',
-        'XHD1002',
-        '1973 Betsey Clark',
-        '59.95',
-        'Hallmark',
-        'Not In Stock',
-        '1973',
-        'https://www.hallmarkornaments.com/product.asp?lt_c=1&itemid=15761&qv=1&',
-        '2020-10-10 23:43:35.769627',
-        '2020-10-10 23:43:35.769634'
+        '21916fb8-1159-11eb-95e6-3e22fbe0b01a',
+        'hookedonhallmark_com',
+        'QGO1010 or QSB6083 or QSB6294',
+        '2020 Brass 3/4" inch Ornament Hooks - Pkg of 20',
+        '3.99',
+        'hallmark',
+        'In Stock - Ships Next Business Day',
+        '2013',
+        'https://www.hookedonhallmark.com/2020-Brass-34-inch-Ornament-Hooks--Pkg-of-20_p_8991.html',
+        '2020-10-18 15:46:47.787428',
+        '2020-10-18 15:46:47.787407'
     )

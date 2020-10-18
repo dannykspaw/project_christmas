@@ -33,7 +33,9 @@ def get_by_id(id, projection):
     formatted_projection = ','.join(projection)
     select_statement = 'SELECT {} FROM {} WHERE id = {};'.format(formatted_projection, model, id)
     pg.execute(select_statement)
-    return pg.fetchone()
+
+    result = pg.fetchone()
+    return result
 
 
 @app.hooks
@@ -53,9 +55,9 @@ def find(query, projection, limit=config.resources.limit):
 
 @app.hooks
 def find_one(query, projection):
-    result = find(query, projection)
+    result = find(query, projection, 1)
     if type(result) == list:
-        return result[0]
+        result = result[0]
     return result
 
 

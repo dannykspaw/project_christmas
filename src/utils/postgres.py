@@ -1,6 +1,7 @@
 from os import path
 import psycopg2
 from .config import config
+import psycopg2.extras
 
 
 print('Connecting to postgres...')
@@ -16,7 +17,7 @@ connect = psycopg2.connect(
 connect.autocommit = True
 
 print(str(connect.closed).replace("0","Connected to {}...".format(pg.database)))
-cursor = connect.cursor()
+cursor = connect.cursor(cursor_factory = psycopg2.extras.DictCursor)
 
 # drop tables to easily allow schema changes
 # if config.env == 'default':
