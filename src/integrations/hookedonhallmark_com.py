@@ -40,6 +40,16 @@ def get_year_links():
 
 def __get_ornament_links_by_year(url, links={}):
     driver.get(url)
+
+    try:
+        # if a view all button exists
+        view_all_button = driver.find_element_by_xpath('//*[@id="category"]/div/div/div/section[3]/div/ul[1]/li[1]/a')
+        view_all_link = view_all_button.get_attribute('href')
+        print('navigating to view all page at link {}'.format(view_all_link))
+        driver.get(view_all_link)
+    except:
+        print('no view all button found on base year page. continuing')
+
     ornament_blocks = driver.find_elements_by_class_name("product-item")
 
     # try to find the category button that links to the "view all" page
@@ -117,12 +127,15 @@ def __get_ornament_by_url(link):
 
     # make sure that there is a column for everything in the schema
     ornament_details = dict.fromkeys(COLUMNS, None)
-    ornament_details["sku"] = sku_element.text
-    ornament_details["price"] = price_element.text
-    ornament_details["brand"] = brand_element
-    ornament_details["availability"] = availability_element.text
-    ornament_details["name"] = name_element.text
-    # ornament_details["Product Id"] = id_element.get_attribute('value')
-    ornament_details["vendor"] = integration_name
-    ornament_details["link"] = link
+    try:
+        ornament_details["sku"] = sku_element.text
+        ornament_details["price"] = price_element.text
+        ornament_details["brand"] = brand_element
+        ornament_details["availability"] = availability_element.text
+        ornament_details["name"] = name_element.text
+        # ornament_details["Product Id"] = id_element.get_attribute('value')
+        ornament_details["vendor"] = integration_name
+        ornament_details["link"] = link
+    except:
+        print('link {} ornament_details {}'.format(link, ornament_details))
     return ornament_details

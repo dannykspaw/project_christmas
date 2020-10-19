@@ -8,8 +8,6 @@ import re
 
 from .config import config
 
-from pprint import pprint
-
 
 @signals.worker_shutting_down.connect
 def close(**kwargs):
@@ -38,9 +36,8 @@ def prehook(task_id=None, task=None, **kwargs):
 @signals.task_postrun.connect
 def posthook(task_id=None, task=None, **kwargs):
     # todo: abstract pre-post hooks behind module or simplify to array of functions to run before and after
-    if len(config.hooks.audit.keys()) != 0:
+    if config.auditor.enabled == True and len(config.hooks.audit.keys()) != 0:
         for pattern in config.hooks.audit.keys():
-            # print('checking if task {} matches audit pattern {}'.format(task.name, pattern))
             if re.match(pattern, task.name) != None:
                 priority = config.hooks.priority['auditor.audit']
                 app.send_task('auditor.audit', args=kwargs['args'], kwargs=kwargs, priority=priority)
@@ -90,18 +87,18 @@ def hooks(func):
     def __task(*args, **kwargs):
         task_name = __function_to_task_name(func, task_location)
 
-        print('pre-hooks for task {} args {} kwargs {}'.format(task_name, args, kwargs))
+        # print('pre-hooks for task {} args {} kwargs {}'.format(task_name, args, kwargs))
         result = None
         try:
             result = func(*args, **kwargs)
         except Exception as err:
             print('unable to call function for task', task_name, 'kwargs', kwargs, 'args', args, 'err', err)
 
-        if len(config.hooks.audit.keys()) != 0:
+        if config.auditor.enabled == True and len(config.hooks.audit.keys()) != 0:
             for pattern in config.hooks.audit.keys():
                 if re.match(pattern, task_name) != None:
                     priority = config.hooks.priority['auditor.audit']
-                    # print('auditting task {} args {} kwargs {}'.format(task_name, args, kwargs))
+                    print('auditting task {} args {} kwargs {}'.format(task_name, args, kwargs))
                     kwargs["task_name"] = task_name
                     kwargs["audit_key"] = pattern
                     app.send_task('auditor.audit', args=args, kwargs=kwargs, priority=priority)
@@ -134,9 +131,14 @@ base = 'celery'
 # else:
 #     base = sys.argv[0].replace('.py', '').replace('./', '')
 
-print('Connecting to celery using base {}'.format(base))
-redis = config.redis
-app = Celery(base, broker='redis://{}:{}/'.format(redis.host, redis.port),)
-app.conf.timezone = config.scheduler.timezone
+print('Connecting to celery...')
+
+app = Celery(base, broker='redis://{}:{}/'.format(config.redis.host, config.redis.port))
+app.conf.update(
+    worker_max_tasks_per_child=1,
+    broker_pool_limit=None,
+    timezone=config.scheduler.timezone
+)
+
 app.hooks = hooks
 app.job = job

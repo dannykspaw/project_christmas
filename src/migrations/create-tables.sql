@@ -12,8 +12,9 @@ CREATE TABLE IF NOT EXISTS products (
     created_at TIMESTAMP NOT NULL
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS unique_products_vendor_sku_name ON products (
+CREATE UNIQUE INDEX IF NOT EXISTS unique_products_vendor_sku_name_link ON products (
     vendor,
     sku,
-    name
+    name,
+    link
 );

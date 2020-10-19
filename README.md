@@ -10,6 +10,8 @@
 ![architecture](./images/process-flow.png?raw=true "High-Level Architecture")
 
 #### tasks
+- [ ] integrations
+    - [ ] prototype integration using Scrapy package
 - [ ] celery
     - [ ] segment jobs based on the root consumer
     - [ ] integrator only receives 'integrator*' tasks, etc.
@@ -60,6 +62,56 @@
 ```bash
 ENV (optionsal) default is 'default'
 CONFIG_PATH (optional) default is './config/$ENV.json'
+```
+
+#### queries
+```sql
+-- total count by vendor
+select
+    vendor,
+    count(distinct(sku)) 
+from products
+group by vendor;
+-- output
+--          vendor         | count 
+-- ------------------------+-------
+--  hallmark_ornaments_com | 10270
+--  hookedonhallmark_com   |  6689
+
+-- get count of ornaments by year for a vendor
+select
+    release_year,
+    count(distinct(sku))
+from products
+where vendor = 'hallmark_ornaments_com'
+group by release_year;
+-- output
+--  release_year | count 
+-- --------------+-------
+--  1973         |    21
+--  1974         |    19
+--  1975         |    30
+--  1976         |    49
+-- ...
+
+-- get 5 most recently created products
+select
+    name,
+    price,
+    release_year,
+    created_at
+from products
+order by created_at desc
+limit 5;
+
+-- output
+--                       name                       | price | release_year |         created_at         
+-- -------------------------------------------------+-------+--------------+----------------------------
+--  2014 Felt Snowflake And Mittens Ornaments Set   | 15.95 | 2014         | 2020-10-17 18:09:08.919412
+--  2014 Felt Nature And Holiday Words Ornament Set |  9.98 | 2014         | 2020-10-17 18:09:08.121832
+--  2014 Father Christmas African American          | 38.95 | 2014         | 2020-10-17 18:09:08.089897
+--  2014 Feliz Navidad                              | 14.95 | 2014         | 2020-10-17 18:09:08.060998
+--  2014 Father Christmas #11                       | 28.95 | 2014         | 2020-10-17 18:09:06.955662
 ```
 
 #### setup
