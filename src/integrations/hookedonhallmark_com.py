@@ -121,7 +121,14 @@ def __get_ornament_by_url(link):
     brand_element = 'hallmark'
     sku_element = driver.find_element_by_xpath('//*[@id="product_id"]')
     price_element = driver.find_element_by_xpath('//*[@id="price"]')
+
     availability_element = driver.find_element_by_xpath('//*[@id="availability"]')
+    availability = availability_element.text
+    if 'In Stock - Ships Next Business Day'.lower() in str(availability).lower():
+        availability = 'available'
+    else:
+        availability = 'unavailable'
+
     # id_element = driver.find_element_by_xpath('//*[@id="add"]/input[1]')
     name_element = driver.find_element_by_xpath('//*[@id="add"]/div[2]/div[2]/div[1]/h1')
 
@@ -131,11 +138,11 @@ def __get_ornament_by_url(link):
         ornament_details["sku"] = sku_element.text
         ornament_details["price"] = price_element.text
         ornament_details["brand"] = brand_element
-        ornament_details["availability"] = availability_element.text
+        ornament_details["availability"] = availability
         ornament_details["name"] = name_element.text
         # ornament_details["Product Id"] = id_element.get_attribute('value')
         ornament_details["vendor"] = integration_name
         ornament_details["link"] = link
-    except:
-        print('link {} ornament_details {}'.format(link, ornament_details))
+    except Exception as err:
+        print('unable to sync integration {} using link {} ornament_details {} err {}'.format(integration_name, link, ornament_details, err))
     return ornament_details

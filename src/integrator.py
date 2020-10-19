@@ -13,19 +13,19 @@ import integrations
 sync_interval = __dict_to_timedelta(config.integrator.sync.interval)
 integrations_list = [name for _, name, _ in pkgutil.iter_modules(['integrations'])]
 
-@app.job
+# @app.job
 def sync_by_id(id=None):
     '''finds the product by id and calls the associated integration to update it using the product url'''
 
     # 1. get the product in the database with this id
-    product = products.get_by_id(id, ['id', 'vendor', 'price', 'availability', 'last_synced_at'])
+    product = products.get_by_id(id, ['id', 'vendor', 'price', 'availability', 'link', 'last_synced_at'])
     if product != None:
         # only sync using an id so we can lookup using the unique id
         # raise Exception('unable to sync integration {} by url {} err product not found in database'.format(integration_name, url))
 
         # the integration doesn't need to be synced again
         # print(datetime.fromtimestamp(product[1]), type(datetime.fromtimestamp(product[1])))
-        if (product[1] + sync_interval) > datetime.now():
+        if (product['last_synced_at'] + sync_interval) > datetime.now():
             print('skipping sync product id {} because it was synced in the last {}'.format(product.id, sync_interval))
             return
     
@@ -188,6 +188,9 @@ if __name__ == "__main__":
 
     # by year
     # sync_integration_by_year('hallmark_ornaments', 2004)
+
+    # by id
+    # sync_by_id('52b481ee-0e60-11eb-8a23-acde48001122')
 
     # update product
     # update_object = {

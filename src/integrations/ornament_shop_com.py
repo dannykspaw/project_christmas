@@ -85,13 +85,19 @@ def __get_ornament_by_url(link):
     availability_element = driver.find_element_by_xpath('/html/body/div[3]/div[1]/div[2]/div/div[1]/section[2]/div/dl/dd[6]')
     # id_element = driver.find_element_by_xpath('/html/body/div[3]/div[1]/div[2]/div/div[1]/section[3]/div[1]/form[1]/input[2]')
 
+    availability = availability_element.text
+    if 'new' in str(availability).lower() or 'in stock' in str(availability).lower():
+        availability = 'available'
+    else:
+        availability = 'unavailable'
+
     # make sure that there is a column for everything in the schema
     ornament_details = dict.fromkeys(COLUMNS, None)
     ornament_details["sku"] = sku_element.text
     ornament_details["name"] = name_element.text
     ornament_details["price"] = price_element.text
     ornament_details["brand"] = brand_element.text
-    ornament_details["availability"] = availability_element.text
+    ornament_details["availability"] = availability
     # ornament_details["vendor_id"] = id_element.get_attribute('value')
     ornament_details["vendor"] = integration_name
     ornament_details["link"] = link

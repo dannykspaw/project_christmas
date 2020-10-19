@@ -31,7 +31,7 @@ columns = columns(model)
 @app.hooks
 def get_by_id(id, projection):
     formatted_projection = ','.join(projection)
-    select_statement = 'SELECT {} FROM {} WHERE id = {};'.format(formatted_projection, model, id)
+    select_statement = 'SELECT {} FROM {} WHERE id = \'{}\';'.format(formatted_projection, model, id)
     pg.execute(select_statement)
 
     result = pg.fetchone()
