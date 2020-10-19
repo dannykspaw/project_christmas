@@ -45,7 +45,7 @@ def __get_ornament_by_url(link):
     product_name = sku_name_code_split.split("name:")[1]
     product_price = sku_price_split.split(":")[1].split(",availability")[0]
     product_availability = sku_price_split.split("availability:")[1].split(
-        ",currency")[0].replace("0", "Not In Stock").replace("1", "In Stock")
+        ",currency")[0].replace("0", "unavailable").replace("1", "available")
     product_brand = "hallmark"
     product_id = sku_name_code_split.split("catalogid:")[1].split(",id")[0]
     product_vendor = integration_name
