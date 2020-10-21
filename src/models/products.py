@@ -126,6 +126,7 @@ def update(query, update_object):
 
 def __format(new_object):
     try:
+        # new_object['sku'] = str(new_object['sku']).lower()
         new_object['last_synced_at'] = datetime.utcnow()
         new_object['price'] = Decimal(sub(r'[^\d.]', '', str(new_object['price'])))
     except Exception as err:
